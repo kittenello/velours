@@ -249,7 +249,7 @@ local ui_elements = {
     settings = {
         gen_label = ui_label(group, "\v•\r Visuals"),
         gen_label_line = ui_label(group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
-        --arrows = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFArrows", {129, 142, 255, 255}),
+        arrows = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFArrows", {255, 255, 255}),
         watermark = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFWatermark"),
         start_col = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFStart Color", {138, 120, 197}),
         end_col = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFEnd Color", {55, 52, 67}),
@@ -1732,18 +1732,28 @@ end
 local clantag_change = function(el,force) if el.value and not force then return end client_set_clan_tag() end
 
 center = { w/2,h/2 }
---arrows_func = function()
---    local ent = entity_get_local_player()
---    if not ui_elements.main_check.value or not ui_elements.settings.arrows.value or not entity_is_alive(ent) then return end
---    local bodyyaw = anti_aims.get_desync(1)
---    local manual_aa1 = extra_dir == 90
---    local manual_aa2 = extra_dir == -90
---    local r,g,b,a = ui_elements.settings.arrows.color:get()
---    
---    renderer_triangle(center[1] + 52, center[2], center[1] + 42, center[2] - 5, center[1] + 42, center[2] + 7, manual_aa1 and r or 45, manual_aa1 and g or 45, manual_aa1 and b or 45, manual_aa1 and a or 150)
---    renderer_triangle(center[1] - 52, center[2], center[1] - 42, center[2] - 5, center[1] - 42, center[2] + 7, manual_aa2 and r or 45, manual_aa2 and g or 45, manual_aa2 and b or 45, manual_aa2 and a or 150)
---
---end
+local arrows_func = function()
+    local ent = entity_get_local_player()
+    if not ui_elements.main_check.value or not ui_elements.settings.arrows.value or not entity_is_alive(ent) then return end
+
+    local bodyyaw = anti_aims.get_desync(1)
+    local manual_aa1 = extra_dir == 90
+    local manual_aa2 = extra_dir == -90
+    local r, g, b, a = ui_elements.settings.arrows.color:get()
+
+    -- Создаем таблицы для координат
+    local A1 = { x = center[1] + 52, y = center[2] }
+    local B1 = { x = center[1] + 42, y = center[2] - 5 }
+    local C1 = { x = center[1] + 42, y = center[2] + 7 }
+
+    local A2 = { x = center[1] - 52, y = center[2] }
+    local B2 = { x = center[1] - 42, y = center[2] - 5 }
+    local C2 = { x = center[1] - 42, y = center[2] + 7 }
+
+    -- Вызываем renderer_triangle с таблицами
+    renderer_triangle(A1, B1, C1, manual_aa1 and r or 45, manual_aa1 and g or 45, manual_aa1 and b or 45, manual_aa1 and a or 150)
+    renderer_triangle(A2, B2, C2, manual_aa2 and r or 45, manual_aa2 and g or 45, manual_aa2 and b or 45, manual_aa2 and a or 150)
+end
 
 function rgb_based(p)
     local r = 124*2 - 124 * p
@@ -4774,41 +4784,40 @@ lp = entity.get_local_player
 thirdperson_china = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
 
 
+function hsv_to_rgb(h, s, v)
+    local r, g, b
+    local i = math.floor(h * 6)
+    local f = h * 6 - i
+    local p = v * (1 - s)
+    local q = v * (1 - f * s)
+    local t = v * (1 - (1 - f) * s)
+
+    i = i % 6
+
+    if i == 0 then r, g, b = v, t, p
+    elseif i == 1 then r, g, b = q, v, p
+    elseif i == 2 then r, g, b = p, v, t
+    elseif i == 3 then r, g, b = p, q, v
+    elseif i == 4 then r, g, b = t, p, v
+    elseif i == 5 then r, g, b = v, p, q
+    end
+
+    return r * 255, g * 255, b * 255
+end
+
 renderer_triangle = function(v2_A, v2_B, v2_C, r, g, b, a)
     local function i(j, k, l)
-    local m = (k.y - j.y) * (l.x - k.x) - (k.x - j.x) * (l.y - k.y) -- строка ошибки
-    if m < 0 then return true end
-    return false
+        local m = (k.y - j.y) * (l.x - k.x) - (k.x - j.x) * (l.y - k.y)
+        if m < 0 then return true end
+        return false
     end
-    if i(v2_A,v2_B,v2_C) then renderer.triangle(v2_A.x,v2_A.y,v2_B.x,v2_B.y,v2_C.x,v2_C.y,r,g,b,a)
-    elseif i(v2_A,v2_C,v2_B) then renderer.triangle(v2_A.x,v2_A.y,v2_C.x,v2_C.y,v2_B.x,v2_B.y,r,g,b,a)
-    elseif i(v2_B,v2_C,v2_A) then renderer.triangle(v2_B.x,v2_B.y,v2_C.x,v2_C.y,v2_A.x,v2_A.y,r,g,b,a)
-    elseif i(v2_B,v2_A,v2_C) then renderer.triangle(v2_B.x,v2_B.y,v2_A.x,v2_A.y,v2_C.x,v2_C.y,r,g,b,a)
-    elseif i(v2_C,v2_A,v2_B) then renderer.triangle(v2_C.x,v2_C.y,v2_A.x,v2_A.y,v2_B.x,v2_B.y,r,g,b,a)
-    else renderer.triangle(v2_C.x,v2_C.y,v2_B.x,v2_B.y,v2_A.x,v2_A.y,r,g,b,a)end
+    if i(v2_A, v2_B, v2_C) then renderer.triangle(v2_A.x, v2_A.y, v2_B.x, v2_B.y, v2_C.x, v2_C.y, r, g, b, a)
+    elseif i(v2_A, v2_C, v2_B) then renderer.triangle(v2_A.x, v2_A.y, v2_C.x, v2_C.y, v2_B.x, v2_B.y, r, g, b, a)
+    elseif i(v2_B, v2_C, v2_A) then renderer.triangle(v2_B.x, v2_B.y, v2_C.x, v2_C.y, v2_A.x, v2_A.y, r, g, b, a)
+    elseif i(v2_B, v2_A, v2_C) then renderer.triangle(v2_B.x, v2_B.y, v2_A.x, v2_A.y, v2_C.x, v2_C.y, r, g, b, a)
+    elseif i(v2_C, v2_A, v2_B) then renderer.triangle(v2_C.x, v2_C.y, v2_A.x, v2_A.y, v2_B.x, v2_B.y, r, g, b, a)
+    else renderer.triangle(v2_C.x, v2_C.y, v2_B.x, v2_B.y, v2_A.x, v2_A.y, r, g, b, a)
     end
-
-
-function hsv_to_rgb(h, s, v)
-	local r, g, b
-
-	local i = math.floor(h * 6);
-	local f = h * 6 - i;
-	local p = v * (1 - s);
-	local q = v * (1 - f * s);
-	local t = v * (1 - (1 - f) * s);
-
-	i = i % 6
-
-	if i == 0 then r, g, b = v, t, p
-	elseif i == 1 then r, g, b = q, v, p
-	elseif i == 2 then r, g, b = p, v, t
-	elseif i == 3 then r, g, b = p, q, v
-	elseif i == 4 then r, g, b = t, p, v
-	elseif i == 5 then r, g, b = v, p, q
-	end
-
-	return r * 255, g * 255, b * 255
 end
 
 function world_circle(origin, size)
@@ -4886,7 +4895,7 @@ ui_elements.anti_aims.anti_brute.conditions:set_event("aim_hit", anti_brute_forc
 
 ui_elements.settings.anim_breaker:set_event("pre_render", animation_breaker)
 ui_elements.settings.clantag:set_event("paint", clantag_func)
---ui_elements.settings.arrows:set_event("paint", arrows_func)
+ui_elements.settings.arrows:set_event("paint", arrows_func)
 ui_elements.settings.indicators:set_event("paint", indicators)
 ui_elements.settings.aspect_ratio:set_event("paint", aspect_ratio.main_f)
 ui_elements.settings.velocity_warning:set_event("paint_ui", velocity_warning)
