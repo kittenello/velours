@@ -271,7 +271,8 @@ local ui_elements = {
         --def_indicator = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFDefensive Indicator", {255, 255, 255}),
         velocity_warning = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFVelocity Warning", {255, 81, 81}),
         low_ammo = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFLow ammo warning"),
-        enablechina = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHat", {"Off", "Nimbus", "China"}),
+        enablechina = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHat Type", {"None", "Nimbus", "China"}),
+        colorchinareal = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHat Color", {255, 255, 255}),
         spacikdg = ui_label(group, "\n\n"),
         misc_labegfliok = ui_label(group, "\v•\r Other Visuals"),
         misc_labegfsl_line = ui_label(group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
@@ -283,8 +284,6 @@ local ui_elements = {
         fireball_speed = ui_slider(group, "\aF88BFFFF:3 ~ \aFFFFFFFFFireball Speed", 1, 10, 5, true, "x"),
         fireball_count = ui_slider(group, "\aF88BFFFF:3 ~ \aFFFFFFFFFireball Count", 10, 200, 10, true),
         animate_left_down = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAnimate Left Down"),
-        auto_unmute = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto Unmute Players"),
-        auto_unmute_filters = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFUnmute Filters", {"All players", "Self", "Friends"}),
         vgui_color_checkbox = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Modulation", {25, 25, 25, 100}),
         fog_correction = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFForce Fog Correction", {255, 255, 255}),
         fog_start_distance = ui_slider(group, "\aF88BFFFF:3 ~ \aFFFFFFFFFOG Start Distance", 0, 2500, 500),
@@ -321,6 +320,8 @@ local ui_elements = {
         distance_slider = ui_slider(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFDistance Avoid-Backstab", 0, 500, 230, true),
         optimizatica = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFFPS Optimization"),
         hidechatbox = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFHide Chat"),
+        taskbarnotify = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaskbar Notify on Round Start"),
+        taskbarnotifyend = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaskbar Notify on Round End"),
         auto_smoke = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Smoke"),
         auto_smoke_bind = ui_hotkey(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Smoke Hotkey"),
         auto_smoke_cam = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFNo Restore Camera"),
@@ -990,11 +991,10 @@ ui_elements.settings.animates_left_down:depend(ui_elements.settings.snowball)
 ui_elements.settings.fireball_speed:depend(ui_elements.settings.fireball)
 ui_elements.settings.fireball_count:depend(ui_elements.settings.fireball)
 ui_elements.settings.animate_left_down:depend(ui_elements.settings.fireball)
-ui_elements.ragebotik.min_damage_slider:depend(ui_elements.ragebotik.min_damage_override_checkbox)
+ui_elements.ragebotik.min_damage_slider:depend(ui_elements.ragebotik.min_damage_override_checkbox)  
 ui_elements.settings.molotov_radius_reference:depend(ui_elements.settings.grenades_checkbox)
 ui_elements.settings.molotov_label:depend(ui_elements.settings.grenades_checkbox)
 ui_elements.settings.smoke_radius_reference:depend(ui_elements.settings.grenades_checkbox)
-ui_elements.settings.auto_unmute_filters:depend(ui_elements.settings.auto_unmute)
 ui_elements.buybotik.buybot_gear:depend(ui_elements.buybotik.buybot_enabled)
 ui_elements.buybotik.buybot_pistol:depend(ui_elements.buybotik.buybot_enabled)
 ui_elements.buybotik.buybot_primary:depend(ui_elements.buybotik.buybot_enabled)
@@ -3428,507 +3428,6 @@ ui_elements.settings.type:set_callback(function()
     toggle_log_misses_due_to_spread()
 end)
 
-js = panorama.loadstring([[
-    let entity_panels = {}
-    let entity_flair_panels = {}
-    let entity_data = {}
-    let event_callbacks = {}
-
-    let unmuted_players = {}
-
-    let TEAM_COLORS = {
-        CT: "#B5D4EE40",
-        TERRORIST: "#EAD18A61"
-    }
-
-    let SHADOW_COLORS = {
-        CT: "#393C40",
-        TERRORIST: "#4C4844"
-    }
-
-    let HIDDEN_IDS = ["id-sb-name__commendations__leader", "id-sb-name__commendations__teacher", "id-sb-name__commendations__friendly", "id-sb-name__musickit"]
-
-    let SLOT_LAYOUT = `
-        <root>
-            <Panel style="min-width: 3px; padding-top: 2px; padding-left: 2px; overflow: noclip;">
-                <Image id="smaller" textureheight="15" style="horizontal-align: center; opacity: 0.01; transition: opacity 0.1s ease-in-out 0.0s, img-shadow 0.12s ease-in-out 0.0s; overflow: noclip; padding: 3px 5px; margin: -3px -5px;"  />
-                <Image id="small" textureheight="17" style="horizontal-align: center; opacity: 0.01; transition: opacity 0.1s ease-in-out 0.0s, img-shadow 0.12s ease-in-out 0.0s; overflow: noclip; padding: 3px 5px; margin: -3px -5px;" />
-                <Image id="medium" textureheight="18" style="horizontal-align: center; opacity: 0.01; transition: opacity 0.1s ease-in-out 0.0s, img-shadow 0.12s ease-in-out 0.0s; overflow: noclip; padding: 3px 5px; margin: -3px -5px; margin-top: -4px;" />
-                <Image id="large" textureheight="21" style="horizontal-align: center; opacity: 0.01; transition: opacity 0.1s ease-in-out 0.0s, img-shadow 0.12s ease-in-out 0.0s; overflow: noclip; padding: 3px 5px; margin: -3px -5px; margin-top: -5px;" />
-            </Panel>
-        </root>
-    `
-
-    let MIN_WIDTHS = {}
-    let MAX_WIDTHS = {}
-    let SLOT_OVERRIDE = {}
-
-    let GameStateAPI_IsLocalPlayerPlayingMatch_prev
-    let FriendsListAPI_IsSelectedPlayerMuted_prev
-    let GameStateAPI_IsSelectedPlayerMuted_prev
-    let my_xuid = MyPersonaAPI.GetXuid()
-
-    let _SetMinMaxWidth = function(weapon, min_width, max_width, slot_override) {
-        if(min_width)
-            MIN_WIDTHS[weapon] = min_width
-
-        if(max_width)
-            MAX_WIDTHS[weapon] = max_width
-
-        if(slot_override)
-            SLOT_OVERRIDE[weapon] = slot_override
-    }
-
-    let _DestroyEntityPanels = function() {
-        for(key in entity_panels){
-            let panel = entity_panels[key]
-
-            if(panel != null && panel.IsValid()) {
-                var parent = panel.GetParent()
-
-                HIDDEN_IDS.forEach(id => {
-                    let panel = parent.FindChildTraverse(id)
-
-                    if(panel != null) {
-                        panel.style.maxWidth = "28px"
-                        panel.style.margin = "0px 5px 0px 5px"
-                    }
-                })
-
-                if(parent.FindChildTraverse("id-sb-skillgroup-image") != null) {
-                    parent.FindChildTraverse("id-sb-skillgroup-image").style.margin = "0px 0px 0px 0px"
-                }
-
-                panel.DeleteAsync(0.0)
-            }
-
-            delete entity_panels[key]
-        }
-    }
-
-    let _GetOrCreateCustomPanel = function(xuid) {
-        if(entity_panels[xuid] == null || !entity_panels[xuid].IsValid()){
-            entity_panels[xuid] = null
-
-            // $.Msg("creating panel for ", xuid)
-            let scoreboard_context_panel = $.GetContextPanel().FindChildTraverse("ScoreboardContainer").FindChildTraverse("Scoreboard") || $.GetContextPanel().FindChildTraverse("id-eom-scoreboard-container").FindChildTraverse("Scoreboard")
-
-            if(scoreboard_context_panel == null){
-                // usually happens if end of match scoreboard is open. clean up everything?
-
-                _Clear()
-                _DestroyEntityPanels()
-
-                return
-            }
-
-            scoreboard_context_panel.FindChildrenWithClassTraverse("sb-row").forEach(function(el){
-                let scoreboard_el
-
-                if(el.m_xuid == xuid) {
-                    el.Children().forEach(function(child_frame){
-                        let stat = child_frame.GetAttributeString("data-stat", "")
-                        if(stat == "name") {
-                            scoreboard_el = child_frame.GetChild(0)
-                        } else if(stat == "flair") {
-                            entity_flair_panels[xuid] = child_frame.GetChild(0)
-                        }
-                    })
-
-                    if(scoreboard_el) {
-                        let scoreboard_el_parent = scoreboard_el.GetParent()
-
-                        // fix some style. this is not restored
-                        // scoreboard_el_parent.style.overflow = "clip clip;"
-
-                        // create panel
-                        let custom_weapons = $.CreatePanel("Panel", scoreboard_el_parent, "custom-weapons", {
-                            style: "overflow: noclip; width: fit-children; margin: 0px 0px 0px 0px; padding: 1px 0px 0px 0px; height: 100%; flow-children: left; min-width: 30px;"
-                        })
-
-                        HIDDEN_IDS.forEach(id => {
-                            let panel = scoreboard_el_parent.FindChildTraverse(id)
-
-                            if(panel != null) {
-                                panel.style.maxWidth = "0px"
-                                panel.style.margin = "0px"
-                            }
-                        })
-
-                        if(scoreboard_el_parent.FindChildTraverse("id-sb-skillgroup-image") != null) {
-                            scoreboard_el_parent.FindChildTraverse("id-sb-skillgroup-image").style.margin = "0px 0px 0px 5px"
-                        }
-
-                        scoreboard_el_parent.MoveChildBefore(custom_weapons, scoreboard_el_parent.GetChild(1))
-
-                        // create child panels
-                        let panel_armor = $.CreatePanel("Image", custom_weapons, "armor", {
-                            textureheight: "17",
-                            style: "padding-left: 2px; padding-top: 3px; opacity: 0.2; padding-left: 5px;"
-                        })
-                        panel_armor.visible = false
-
-                        let panel_helmet = $.CreatePanel("Image", custom_weapons, "helmet", {
-                            textureheight: "22",
-                            style: "padding-left: 2px; padding-top: 0px; opacity: 0.2; padding-left: 0px; margin-left: 3px; margin-right: -3px;"
-                        })
-                        panel_helmet.visible = false
-                        panel_helmet.SetImage("file://{images}/icons/equipment/helmet.svg")
-
-                        for(i=24; i >= 0; i--) {
-                            let panel_slot_parent = $.CreatePanel("Panel", custom_weapons, `weapon-${i}`)
-
-                            panel_slot_parent.visible = false
-                            panel_slot_parent.BLoadLayoutFromString(SLOT_LAYOUT, false, false)
-                        }
-
-                        // custom_weapons.style.border = "1px solid red;"
-                        entity_panels[xuid] = custom_weapons
-
-                        return custom_weapons
-                    }
-                }
-            })
-        }
-
-        return entity_panels[xuid]
-    }
-
-    let _UpdatePlayer = function(entindex, weapons, selected_weapon, armor) {
-        if(entindex == null || entindex == 0)
-            return
-
-        entity_data[entindex] = arguments
-    }
-
-    let _ApplyPlayer = function(entindex, weapons, selected_weapon, armor) {
-        let xuid = GameStateAPI.GetPlayerXuidStringFromEntIndex(entindex)
-
-        // $.Msg("applying for ", entindex, ": ", weapons)
-        let panel = _GetOrCreateCustomPanel(xuid)
-
-        if(panel == null)
-            return
-
-        let team = GameStateAPI.GetPlayerTeamName(xuid)
-        let wash_color = TEAM_COLORS[team] || "#ffffffff"
-
-        // panel.style.marginRight = entity_flair_panels[entindex].actuallayoutwidth < 4 ? "-25px" : "0px"
-
-        for(i=0; i < 24; i++) {
-            let panel_slot_parent = panel.FindChild(`weapon-${i}`)
-
-            if(weapons && weapons[i]) {
-                let weapon = weapons[i]
-                let selected = weapon == selected_weapon
-                panel_slot_parent.visible = true
-
-                let slot_override = SLOT_OVERRIDE[weapon] || "small"
-
-                let panel_slot
-                panel_slot_parent.Children().forEach(function(el){
-                    if(el.id == slot_override){
-                        el.visible = true
-                        panel_slot = el
-                    } else {
-                        el.visible = false
-                    }
-                })
-
-                panel_slot.style.opacity = selected ? "0.85" : "0.35"
-
-                let shadow_color = SHADOW_COLORS[team] || "#58534D"
-                // shadow_color = "rgba(64, 64, 64, 0.1)"
-                panel_slot.style.imgShadow = selected ? (shadow_color + " 0px 0px 3px 3.75") : "none"
-
-                panel_slot.style.washColorFast = wash_color
-                panel_slot.SetImage("file://{images}/icons/equipment/" + weapon + ".svg")
-                // panel_slot.style.border = "1px solid red;"
-
-                panel_slot.style.marginLeft = "-5px"
-                panel_slot.style.marginRight = "-5px"
-
-                if(weapon == "knife_ursus") {
-                    panel_slot.style.marginLeft = "-2px"
-                } else if(weapon == "knife_widowmaker") {
-                    panel_slot.style.marginLeft = "-3px"
-                } else if(weapon == "hkp2000") {
-                    panel_slot.style.marginRight = "-4px"
-                } else if(weapon == "incgrenade") {
-                    panel_slot.style.marginLeft = "-6px"
-                } else if(weapon == "flashbang") {
-                    panel_slot.style.marginLeft = "-5px"
-                }
-
-                panel_slot_parent.style.minWidth = MIN_WIDTHS[weapon] || "0px"
-                panel_slot_parent.style.maxWidth = MAX_WIDTHS[weapon] || "1000px"
-            } else if(panel_slot_parent.visible) {
-                // $.Msg("removed!")
-                panel_slot_parent.visible = false
-                let panel_slot = panel_slot_parent.GetChild(0)
-                panel_slot.style.opacity = "0.01"
-            }
-        }
-
-        let panel_armor = panel.FindChild("armor")
-        let panel_helmet = panel.FindChild("helmet")
-
-        if(armor != null){
-            panel_armor.visible = true
-            panel_armor.style.washColorFast = wash_color
-
-            if(armor == "helmet") {
-                panel_armor.SetImage("file://{images}/icons/equipment/kevlar.svg")
-
-                panel_helmet.visible = true
-                panel_helmet.style.washColorFast = wash_color
-            } else {
-                panel_armor.SetImage("file://{images}/icons/equipment/" + armor + ".svg")
-            }
-        } else {
-            panel_armor.visible = false
-            panel_helmet.visible = false
-        }
-
-        return true
-    }
-
-    let _ApplyData = function() {
-        for(entindex in entity_data) {
-            entindex = parseInt(entindex)
-            let xuid = GameStateAPI.GetPlayerXuidStringFromEntIndex(entindex)
-
-            if(!entity_data[entindex].applied || entity_panels[xuid] == null || !entity_panels[xuid].IsValid()) {
-                if(_ApplyPlayer.apply(null, entity_data[entindex])) {
-                    // $.Msg("successfully appied for ", entindex)
-                    entity_data[entindex].applied = true
-                }
-            }
-        }
-    }
-
-    let _EnablePlayingMatchHook = function() {
-        if(GameStateAPI_IsLocalPlayerPlayingMatch_prev == null) {
-            GameStateAPI_IsLocalPlayerPlayingMatch_prev = GameStateAPI.IsLocalPlayerPlayingMatch
-
-            GameStateAPI.IsLocalPlayerPlayingMatch = function() {
-                if(GameStateAPI.IsDemoOrHltv()) {
-                    return true
-                }
-
-                return GameStateAPI_IsLocalPlayerPlayingMatch_prev.call(GameStateAPI)
-            }
-        }
-    }
-
-    let _DisablePlayingMatchHook = function() {
-        if(GameStateAPI_IsLocalPlayerPlayingMatch_prev != null) {
-            GameStateAPI.IsLocalPlayerPlayingMatch = GameStateAPI_IsLocalPlayerPlayingMatch_prev
-            GameStateAPI_IsLocalPlayerPlayingMatch_prev = null
-        }
-    }
-
-    let _EnableSelectedPlayerMutedHook = function() {
-        if(FriendsListAPI_IsSelectedPlayerMuted_prev == null) {
-            FriendsListAPI_IsSelectedPlayerMuted_prev = FriendsListAPI.IsSelectedPlayerMuted
-
-            FriendsListAPI.IsSelectedPlayerMuted = function(xuid) {
-                if(xuid == my_xuid) {
-                    return false
-                }
-
-                return FriendsListAPI_IsSelectedPlayerMuted_prev.call(FriendsListAPI, xuid)
-            }
-        }
-
-        if(GameStateAPI_IsSelectedPlayerMuted_prev == null) {
-            GameStateAPI_IsSelectedPlayerMuted_prev = GameStateAPI.IsSelectedPlayerMuted
-
-            GameStateAPI.IsSelectedPlayerMuted = function(xuid) {
-                if(xuid == my_xuid) {
-                    return false
-                }
-
-                return GameStateAPI_IsSelectedPlayerMuted_prev.call(GameStateAPI, xuid)
-            }
-        }
-    }
-
-    let _DisableSelectedPlayerMutedHook = function() {
-        if(FriendsListAPI_IsSelectedPlayerMuted_prev != null) {
-            FriendsListAPI.IsSelectedPlayerMuted = FriendsListAPI_IsSelectedPlayerMuted_prev
-            FriendsListAPI_IsSelectedPlayerMuted_prev = null
-        }
-
-        if(GameStateAPI_IsSelectedPlayerMuted_prev != null) {
-            GameStateAPI.IsSelectedPlayerMuted = GameStateAPI_IsSelectedPlayerMuted_prev
-            GameStateAPI_IsSelectedPlayerMuted_prev = null
-        }
-    }
-
-    let _UnmutePlayer = function(xuid) {
-        if(GameStateAPI.IsSelectedPlayerMuted(xuid)) {
-            GameStateAPI.ToggleMute(xuid)
-            unmuted_players[xuid] = true
-
-            return true
-        }
-
-        return false
-    }
-
-    let _RestoreUnmutedPlayers = function(xuid) {
-        for(xuid in unmuted_players) {
-            if(!GameStateAPI.IsSelectedPlayerMuted(xuid) && GameStateAPI.IsPlayerConnected(xuid)) {
-                GameStateAPI.ToggleMute(xuid)
-            }
-        }
-        unmuted_players = {}
-    }
-
-    let _GetAllPlayers = function() {
-        let result = []
-
-        for(entindex=1; entindex <= 64; entindex++) {
-            let xuid = GameStateAPI.GetPlayerXuidStringFromEntIndex(entindex)
-
-            if(xuid && xuid != "0") {
-                result.push(xuid)
-            }
-        }
-
-        return result
-    }
-
-    let _Create = function() {
-        event_callbacks["OnOpenScoreboard"] = $.RegisterForUnhandledEvent("OnOpenScoreboard", _ApplyData)
-        event_callbacks["Scoreboard_UpdateEverything"] = $.RegisterForUnhandledEvent("Scoreboard_UpdateEverything", function(){
-            // $.Msg("cleared applied data")
-            for(entindex in entity_data) {
-                // entity_data[entindex].applied = false
-            }
-            _ApplyData()
-        })
-        event_callbacks["Scoreboard_UpdateJob"] = $.RegisterForUnhandledEvent("Scoreboard_UpdateJob", _ApplyData)
-    }
-
-    let _Clear = function() {
-        entity_data = {}
-    }
-
-    let _Destroy = function() {
-        // clear entity data
-        _Clear()
-        _DestroyEntityPanels()
-
-        for(event in event_callbacks){
-            $.UnregisterForUnhandledEvent(event, event_callbacks[event])
-
-            delete event_callbacks[event]
-        }
-
-        // $.GetContextPanel().FindChildTraverse("TeamSmallContainerCT").style.width = "400px"
-        // $.GetContextPanel().FindChildTraverse("TeamSmallContainerT").style.width = "400px"
-    }
-
-    return {
-        create: _Create,
-        set_min_max_width: _SetMinMaxWidth,
-        destroy: _Destroy,
-        clear: _Clear,
-        update_player: _UpdatePlayer,
-        enable_playing_match_hook: _EnablePlayingMatchHook,
-        disable_playing_match_hook: _DisablePlayingMatchHook,
-        enable_selected_player_muted_hook: _EnableSelectedPlayerMutedHook,
-        disable_selected_player_muted_hook: _DisableSelectedPlayerMutedHook,
-        unmute_player: _UnmutePlayer,
-        restore_unmuted_players: _RestoreUnmutedPlayers,
-        get_all_players: _GetAllPlayers
-    }
-]], "CSGOHud")()
-
-function table_map_assoc(tbl, callback)
-    new = {}
-    for k, v in pairs(tbl) do
-        _G.key, _G.value = k, v
-        new_key, new_value = callback(_G.key, _G.value)
-        new[new_key] = new_value
-    end
-    return new
-end
-
-
-function auto_unmute_update_player(xuid, filters)
-    if filters == nil then
-        filters = table_map_assoc(ui_elements.settings.auto_unmute_filters:get(), function(_, typ) return typ, true end)
-    end
-
-    if type(xuid) == "table" then
-        entindex = xuid.userid and client.userid_to_entindex(xuid.userid)
-        if entindex then
-            xuid = GameStateAPI.GetPlayerXuidStringFromEntIndex(entindex)
-
-            if type(xuid) ~= "string" or xuid == "0" then
-                return
-            end
-        else
-            return
-        end
-    end
-
-    if (filters["All players"]) or
-    (filters["Self"] and xuid == MyPersonaAPI.GetXuid()) or
-    (filters["Friends"] and FriendsListAPI.GetFriendRelationship(xuid) == "friend") then
-        if js.unmute_player(xuid) then
-            -- print("Unmuted player:", xuid)
-        else
-            -- print("Player isn't muted:", xuid)
-        end
-    end
-end
-
-function auto_unmute_update_all()
-    filters = table_map_assoc(ui_elements.settings.auto_unmute_filters:get(), function(_, typ) return typ, true end)
-    all_players = json.parse(tostring(js.get_all_players()))
-
-    for _, player in ipairs(all_players) do
-        auto_unmute_update_player(player, filters)
-    end
-end
-
-
-function auto_unmute_level_init()
-    auto_unmute_update_all()
-    client.delay_call(5, auto_unmute_update_all)
-end
-
-
-ui_elements.settings.auto_unmute:set_callback(function()
-    unmute_enabled = table_map_assoc(ui_elements.settings.auto_unmute_filters:get(), function(_, typ) return typ, true end)
-
-    js.restore_unmuted_players()
-
-    if next(unmute_enabled) then
-        auto_unmute_update_all()
-
-        client.set_event_callback("level_init", auto_unmute_level_init)
-        client.set_event_callback("player_connect_full", auto_unmute_update_player)
-
-        if unmute_enabled["Self"] then
-            -- js.enable_selected_player_muted_hook()
-        else
-            js.disable_selected_player_muted_hook()
-        end
-    else
-        client.unset_event_callback("level_init", auto_unmute_level_init)
-        client.unset_event_callback("player_connect_full", auto_unmute_update_player)
-
-        js.disable_selected_player_muted_hook()
-    end
-end)
-
-js.enable_playing_match_hook()
-
 materials = {
     "vgui_white",
     "vgui/hud/800corner1",
@@ -4735,6 +4234,7 @@ function nimbus_world_circle(origin, size)
     end
 
     local last_point = nil
+    local color_g = {ui_elements.settings.colorchinareal.color:get()}
 
     for i = 0, 360, 5 do
         local new_point = {
@@ -4743,12 +4243,14 @@ function nimbus_world_circle(origin, size)
             origin[3]
         }
 
+        local actual_color = color_g
+
         if last_point ~= nil then
             local old_screen_point = {renderer.world_to_screen(last_point[1], last_point[2], last_point[3])}
             local new_screen_point = {renderer.world_to_screen(new_point[1], new_point[2], new_point[3])}
 
             if old_screen_point[1] and new_screen_point[1] then
-                renderer.line(old_screen_point[1], old_screen_point[2], new_screen_point[1], new_screen_point[2], 255, 255, 255, 255)
+                renderer.line(old_screen_point[1], old_screen_point[2], new_screen_point[1], new_screen_point[2], color_g[1], color_g[2], color_g[3], 255)
             end
         end
 
@@ -4759,7 +4261,7 @@ end
 client.set_event_callback("paint_ui", function()
     local hat_selection = ui_elements.settings.enablechina:get()
 
-    if hat_selection == "Off" or hat_selection ~= "Nimbus" then 
+    if hat_selection == "None" or hat_selection ~= "Nimbus" then 
         return 
     end
 
@@ -4826,7 +4328,7 @@ function world_circle(origin, size)
     end
 
     local last_point = nil
-
+    local color_g = {ui_elements.settings.colorchinareal.color:get()}
 
     for i = 0, 360, 5 do
         local new_point = { --Rotate point
@@ -4835,7 +4337,7 @@ function world_circle(origin, size)
             origin[3]
         }
 
-
+        local actual_color = color_g
         --Draw line and polygon
         if last_point ~= nil then
             local old_screen_point = {renderer.world_to_screen(last_point[1], last_point[2], last_point[3])}
@@ -4843,8 +4345,8 @@ function world_circle(origin, size)
             local origin_screen_point = {renderer.world_to_screen(origin[1], origin[2], origin[3] + 8)}
 
             if old_screen_point[1] ~= nil and new_screen_point[1] ~= nil and origin_screen_point[1] ~= nil then
-                renderer_triangle({x = old_screen_point[1], y = old_screen_point[2]}, {x = new_screen_point[1], y = new_screen_point[2]}, {x = origin_screen_point[1], y = origin_screen_point[2]}, 255, 255, 255, 50)     
-                renderer.line(old_screen_point[1], old_screen_point[2], new_screen_point[1], new_screen_point[2], 255, 225, 255, 255)
+                renderer_triangle({x = old_screen_point[1], y = old_screen_point[2]}, {x = new_screen_point[1], y = new_screen_point[2]}, {x = origin_screen_point[1], y = origin_screen_point[2]}, color_g[1], color_g[2], color_g[3], 50)     
+                renderer.line(old_screen_point[1], old_screen_point[2], new_screen_point[1], new_screen_point[2], color_g[1], color_g[2], color_g[3], 255)
             end
         end
 
@@ -4856,7 +4358,7 @@ end
 client.set_event_callback("paint_ui", function()
     local hat_selection = ui_elements.settings.enablechina:get()
 
-    if hat_selection == "Off" or hat_selection ~= "China" then 
+    if hat_selection == "None" or hat_selection ~= "China" then 
         return 
     end
     
@@ -4864,6 +4366,61 @@ client.set_event_callback("paint_ui", function()
 end)
 
 -- КОНЕЦ НИМБА
+
+-- round notify
+
+client_delay_call, client_find_signature, globals_realtime, panorama_open, error, print = client.delay_call, client.find_signature, globals.realtime, panorama.open, error, print
+
+ffi = require "ffi"
+uix = require 'gamesense/uix'
+
+js = panorama_open()
+last_realtime = 0
+
+raw_hwnd 			= client_find_signature("engine.dll", "\x8B\x0D\xCC\xCC\xCC\xCC\x85\xC9\x74\x16\x8B\x01\x8B") or error("Invalid signature #1")
+raw_FlashWindow 	= client_find_signature("gameoverlayrenderer.dll", "\x55\x8B\xEC\x83\xEC\x14\x8B\x45\x0C\xF7") or error("Invalid signature #2")
+raw_insn_jmp_ecx 	= client_find_signature("gameoverlayrenderer.dll", "\xFF\xE1") or error("Invalid signature #3")
+raw_GetForegroundWindow = client_find_signature("gameoverlayrenderer.dll", "\xFF\x15\xCC\xCC\xCC\xCC\x3B\xC6\x74") or error("Invalid signature #4")
+
+hwnd_ptr 		= ((ffi.cast("uintptr_t***", ffi.cast("uintptr_t", raw_hwnd) + 2)[0])[0] + 2)
+FlashWindow 	= ffi.cast("int(__stdcall*)(uintptr_t, int)", raw_FlashWindow)
+insn_jmp_ecx 	= ffi.cast("int(__thiscall*)(uintptr_t)", raw_insn_jmp_ecx)
+GetForegroundWindow = (ffi.cast("uintptr_t**", ffi.cast("uintptr_t", raw_GetForegroundWindow) + 2)[0])[0]
+
+function get_csgo_hwnd()
+	return hwnd_ptr[0]
+end
+
+function get_foreground_hwnd()
+	return insn_jmp_ecx(GetForegroundWindow)
+end
+
+function notify_user()
+	local csgo_hwnd = get_csgo_hwnd()
+	if get_foreground_hwnd() ~= csgo_hwnd then
+		FlashWindow(csgo_hwnd, 1)
+		return true
+	end
+	return false
+end
+
+function on_round_start()
+	if notify_user() then
+		client_delay_call(1, on_round_start)
+	end
+end
+
+function on_round_end()
+    if notify_user() then
+        client_delay_call(1, on_round_end)
+    end
+end
+
+
+do
+    ui_elements.settings.taskbarnotify:set_event("round_start", on_round_start, function() return ui_elements.settings.taskbarnotify:get() end)
+    ui_elements.settings.taskbarnotifyend:set_event("round_end", on_round_end, function() return ui_elements.settings.taskbarnotifyend:get() end)
+end
 
 client.set_event_callback("shutdown", onshutdown)
 client.set_event_callback("run_command", hidechat)
