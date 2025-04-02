@@ -606,7 +606,6 @@ end
             create = ui.new_button("AA", "Other", "\aFFFFFFFF Create", function() end),
             import = ui.new_button("AA", "Other", "\aFFFFFFFF Import", function() end),
             export = ui.new_button("AA", "Other", "\aFFFFFFFF Export", function() end),
-            default = ui.new_button("AA", "Other", " Default cfg", function() end),
         },
     }
 
@@ -980,7 +979,6 @@ end
             end
         end
 
-        ui.set_enabled(menu.configTab.default, false)
         ui.set_visible(menu.miscTab.clantag_mode, ui.get(menu.miscTab.clanTag) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.clantagdur, ui.get(menu.miscTab.clanTag) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.console_logs_resolver, ui.get(menu.miscTab.console_logs_custom_vibor) and (isMiscTab and isEnabled))
