@@ -33,48 +33,6 @@
         viewmodel_z = {[0] = "Z"}
     }
 
-delay = 0.03
-
-primary_weapons = {
-	{name='-', command=""},
-	{name='AWP', command="buy awp; "},
-	{name='Auto-Sniper', command="buy scar20; buy g3sg1; "},
-	{name='Scout', command="buy ssg08; "},
-	{name='Shootgun', command="buy mag7; buy sawedoff "}
-}
-secondary_weapons = {
-	{name='-', command=""},
-	{name='R8 Revolver / Deagle', command="buy deagle; "},
-	{name='Dual Berettas', command="buy elite; "},
-	{name='FN57 / Tec9 / CZ75-Auto', command="buy fn57; "}
-}
-
-gear_weapons = {
-	{name='Kevlar', command="buy vest; "},
-	{name='Helmet', command="buy vesthelm; "},
-	{name='Defuse Kit', command="buy defuser; "},
-	{name='Grenade', command="buy hegrenade; "},
-	{name='Molotov', command="buy incgrenade; "},
-	{name='Smoke', command="buy smokegrenade; "},
-	{name='Flashbang (x2)', command="buy flashbang; "},
-	{name='Taser', command="buy taser; "},
-}
-
-function get_names(tbl)
-	local names = {}
-	for i=1, #tbl do
-		table.insert(names, tbl[i]["name"])
-	end
-	return names
-end
-
-function get_command(tbl, name)
-	for i=1, #tbl do
-		if tbl[i]["name"] == name then
-			return tbl[i]["command"]
-		end
-	end
-end
     local scrsize_x, scrsize_y = client.screen_size()
     local center_x, center_y = scrsize_x / 2, scrsize_y / 2
     local json = require("json")
