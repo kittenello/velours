@@ -5664,7 +5664,7 @@
 
     event_callback("paint", on_paint)
 
-    thirdperson_ezochka = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
+local thirdperson = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
 
 function hsv_to_rgb(h, s, v)
     local r, g, b
@@ -5751,6 +5751,10 @@ client.set_event_callback("paint_ui", function()
         return 
     end
 
+    if not master_state or (not ui.get(thirdperson[1]) or not ui.get(thirdperson[2])) or lp() == nil or entity.is_alive(lp()) == false then
+        return
+    end
+
 
     local lp = entity.get_local_player()
     if not lp or not entity.is_alive(lp) then
@@ -5766,6 +5770,8 @@ end)
 -- конец нимба
 
 -- чайна хат
+
+local thirdperson = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
 
 lp = entity.get_local_player
 
@@ -5856,6 +5862,10 @@ client.set_event_callback("paint_ui", function()
 
     if hat_selection == "None" or hat_selection ~= "China" then 
         return 
+    end
+
+    if (not ui.get(thirdperson[1]) or not ui.get(thirdperson[2])) or lp() == nil or entity.is_alive(lp()) == false then
+        return
     end
 
     
