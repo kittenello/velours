@@ -6545,4 +6545,4 @@ client.set_event_callback("aim_hit", on_aim_shot)
         renderer_trace_positions()
         local target = client.current_threat()
         if target then local threat_origin = vector(entity.get_origin(target)) threat_origin_wts_x = renderer.world_to_screen(threat_origin.x, threat_origin.y, threat_origin.z) end
-    end)
+    end) --
