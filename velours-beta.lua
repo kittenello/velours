@@ -478,7 +478,7 @@ local menu = {
         widgets_slow_width = slider("AA", "Fake lag", "\n\aF88BFFFF:3 ~ \aFFFFFFFFWidth", 1,15,4),
         ammo_low = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFLow Ammo Warning"),
         gs_ind = switch(fl_tab, "\aF88BFFFF:3 ~ \a32CD32FF50$\aFFFFFFFF indicators"),
-        --custom_indicator = ui.new_textbox("AA", "Fake lag", "\aF88BFFFF:3 ~ \a32CD32FF\a9966ccCustom\affffffff Indicator"),
+        custom_indicator = ui.new_textbox("AA", "Fake lag", "\aF88BFFFF:3 ~ \a32CD32FF\a9966ccCustom\affffffff Indicator"),
         trace_target = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFTrace Target"),
         trace_color = ui.new_color_picker("AA", "Fake lag", "\aF88BFFFF:3 ~ \aFFFFFFFFTrace Color"),
         grenade_radius = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFGrenades ESP Radius [BETA]"),
@@ -6581,7 +6581,9 @@ elseif original_hitchance then
 end
 end)
 
-
+client.set_event_callback("paint_ui", function()
+    renderer.indicator(164, 158, 229, 255, ui.get(custom_indicator))
+end)
 
 event_callback("paint_ui", function()
 if ui.get(menu.visualsTab.fpsboost) then
