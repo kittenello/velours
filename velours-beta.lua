@@ -6327,6 +6327,8 @@ killsay_func = function(e)
         end
     elseif add_type == "Miss" then
         return
+    elseif add_type == "Hit" then
+        return
     elseif selected_type == "Delayed 1" then
         client.delay_call(5, function()
             client.exec("say 1")
