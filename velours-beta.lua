@@ -564,7 +564,7 @@
             clantag_mode = combo(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFMode", {"velours", "velours.lua"}),
             killsay = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk"),
             killsay_type = combo(fl_tab, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Type", {"Default", "Ad", "Revenge", "Simple 1", "Delayed"}),
-            killsay_add = list(fl_tab, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss"}),
+            killsay_add = list(fl_tab, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss", "Hit"}),
             console_logs = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Hit-logs"),
             console_logs_custom_vibor = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom '?' Miss Reason"),
             console_logs_resolver = combo(fl_tab, "\n\aF88BFFFF:3 ~ \aFFFFFFFFCustom '?' reason\r", {"resolver", "kitty :3", "desync", "lagcomp failure", "spread", "occlusion", "wallshot failure", "unprediction error", "unregistered shot"}),
@@ -6289,6 +6289,10 @@ miss_words = {
     "але мандариновый жиробас, ты когда прыгать перестанешь?"
 }
 
+shot_words = {
+    "1"
+}
+
 last_killer = nil
 
 killsay_func = function(e)
@@ -6342,6 +6346,14 @@ function on_aim_miss(e)
 
     client.delay_call(1, function()
         client.exec("say " .. miss_words[client.random_int(1, #miss_words)])
+    end)
+end
+
+function on_aim_shot(e)
+    if not ui.get(menu.miscTab.killsay) or not func.includes(ui.get(menu.miscTab.killsay_add), "Hit") then return end
+
+    client.delay_call(1, function()
+        client.exec("say " .. shot_words[client.random_int(1, #shot_words)])
     end)
 end
 
@@ -6407,6 +6419,7 @@ end)
 client.set_event_callback("player_death", killsay_func)
 client.set_event_callback("player_death", track_last_killer)
 client.set_event_callback("aim_miss", on_aim_miss)
+client.set_event_callback("aim_hit", on_aim_shot)
 
 
     event_callback("paint_ui", function()
