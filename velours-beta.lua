@@ -6353,10 +6353,8 @@ end
 function on_aim_miss(e)
     if not ui.get(menu.miscTab.killsay) or not func.includes(ui.get(menu.miscTab.killsay_add), "Miss") then return end
 
-    client.delay_call(1, function()
         client.exec("say " .. miss_words[client.random_int(1, #miss_words)])
-    end)
-end
+    end
 
 function on_aim_shot(e)
     if not ui.get(menu.miscTab.killsay) or not func.includes(ui.get(menu.miscTab.killsay_add), "Hit") then return end
