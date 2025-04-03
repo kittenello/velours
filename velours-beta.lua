@@ -159,7 +159,7 @@
             fakelag_limit = ref_ui('RAGE', 'Aimbot', 'Double tap fake lag limit')
         }
     }
-    -- test1sdsssss
+    -- test1sdsssssgg
     local binds = {
         legMovement = ui.multiReference("AA", "Other", "Leg movement"),
         slowmotion = ui.multiReference("AA", "Other", "Slow motion"),
