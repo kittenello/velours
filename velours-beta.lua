@@ -1,5 +1,5 @@
 
-    local lua_name, lua_color, script_build, altrue, m_out_pos, m_time, m_alpha, panel_height, panel_offset, panel_color, text_color = "velours", {r = 255, g = 255, b = 255}, "stable", true, { ui.menu_position() }, globals.realtime(), 0, 25, 5, { 25, 25, 25, 200 }, { 255, 255, 255, 255 }
+    local lua_name, lua_color, script_build, altrue, m_out_pos, m_time, m_alpha, panel_height, panel_offset, panel_color, text_color = "velours", {r = 255, g = 255, b = 255}, "beta", true, { ui.menu_position() }, globals.realtime(), 0, 25, 5, { 25, 25, 25, 200 }, { 255, 255, 255, 255 }
     local
     event_callback,
     unset_event_callback,
