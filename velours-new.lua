@@ -455,6 +455,10 @@
             snowflake_speed = slider("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFSnowflake Speed", 1, 10, 5, true, "x"),
             snowflake_count = slider("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFSnowflake Count", 10, 200, 10, true),
             animates_left_down = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAnimate Left Down"),
+            fireball = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFForce Fireball Global"),
+            fireball_speed = slider("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFFireball Speed", 1, 10, 5, true, "x"),
+            fireball_count = slider("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFFireball Count", 10, 200, 10, true),
+            animate_left_down = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAnimate Left Down"),
             gen_ljhjhagfgfbel = label(fl_tab, "\v•\r \affc0cbffRender"),
             gen_labejhjhlfggfgf_line = label(fl_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
             
@@ -496,7 +500,53 @@
             custom_color = ui.new_color_picker("AA", container, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Scope Lines", 255, 255, 255, 255),
             custom_initial_pos = slider("AA", container, "\na", 0, 400, 100, true, "px", 1),
             custom_offset = slider("AA", container, "\na", 0, 200, 10, true, "px", 1),
-
+            lab1l1a2eb222 = label(aa_tab, " "),
+            las12leb2b22 = label(aa_tab, " "),
+            lab1f2lebz222 = label(aa_tab, " "),
+            lab123lebx222 = label(aa_tab, " "),
+            lab125lebs222 = label(aa_tab, " "),
+            lab1l2eb2222 = label(aa_tab, " "),
+            line12 = label(aa_tab, " "),
+            line13 = label(aa_tab, " "),
+            line14 = label(aa_tab, " "),
+            line15 = label(aa_tab, " "),
+            line16 = label(aa_tab, " "),
+            line17 = label(aa_tab, " "),
+            line18 = label(aa_tab, " "),
+            line19 = label(aa_tab, " "),
+            line121 = label(aa_tab, " "),
+            line132 = label(aa_tab, " "),
+            line143 = label(aa_tab, " "),
+            line154 = label(aa_tab, " "),
+            line165 = label(aa_tab, " "),
+            line176 = label(aa_tab, " "),
+            line187 = label(aa_tab, " "),
+            line198 = label(aa_tab, " "),
+            line182 = label(aa_tab, " "),
+            line173 = label(aa_tab, " "),
+            line164 = label(aa_tab, " "),
+            line155 = label(aa_tab, " "),
+            lines164 = label(aa_tab, " "),
+            lines173 = label(aa_tab, " "),
+            lines182 = label(aa_tab, " "),
+            line191 = label(aa_tab, " "),
+            line1217 = label(aa_tab, " "),
+            line1326 = label(aa_tab, " "),
+            line1435 = label(aa_tab, " "),
+            line1545 = label(aa_tab, " "),
+            line1654 = label(aa_tab, " "),
+            line1763 = label(aa_tab, " "),
+            line1872 = label(aa_tab, " "),
+            line1981 = label(aa_tab, " "),
+            line21 = label(fl_tab, " "),
+            line22 = label(fl_tab, " "),
+            line23 = label(fl_tab, " "),
+            line24 = label(fl_tab, " "),
+            line25 = label(fl_tab, " "),
+            line26 = label(fl_tab, " "),
+            line27 = label(fl_tab, " "),
+            line28 = label(fl_tab, " "),
+            line29 = label(fl_tab, " "),
             gen_laghghbel = label(other_tab, "\v•\r \affc0cbffAnimations"),
             gen_labeghghl_line = label(other_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
             a_pitch = switch(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFPitch 0 on land"),
@@ -512,7 +562,6 @@
             filtercons = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Filter"),
             clanTag = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag"),
             clantag_mode = combo(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFMode", {"velours", "velours.lua"}),
-            clantagdur = slider("AA", "Fake lag", "\aF88BFFFF:3 ~ \aFFFFFFFFDuration", 15, 500, 30),
             kill_say = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk"),
             console_logs = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Hit-logs"),
             console_logs_custom_vibor = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom '?' Miss Reason"),
@@ -520,6 +569,15 @@
             auto_smoke = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Smoke [BETA]"),
             auto_smoke_bind = ui.new_hotkey("AA", "Fake lag", "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Smoke Hotkey"),
             auto_smoke_cam = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFNo Restore Camera"),
+            settingsmatch = switch(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFWarmup Settings"),
+            settingsmatchqwe = combo(fl_tab,  "Settings for", {"Off", "Test CFG"}),
+            lableb221 = label(fl_tab, " "),
+            lableb222 = label(fl_tab, " "),
+            lableb223 = label(fl_tab, " "),
+            lableb224 = label(fl_tab, " "),
+            lableb225 = label(fl_tab, " "),
+            lableb226 = label(fl_tab, " "),
+            lableb227 = label(fl_tab, " "),
             gasden_laghghbel = label(aa_tab, "\v•\r \affc0cbffOther"),
             gsaden_labeghghl_line = label(aa_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
             jump_scout = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFJumpScout"),
@@ -533,6 +591,14 @@
             speedchina = slider("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFSpeed Hat", 1, 10, 5),
             vgui_color_checkbox = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Modulation"),
             vgui_color = ui.new_color_picker("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Modulation Color", {255, 255, 255}),
+            drop_grenades_helper = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFDrop Grenades Helper"),
+            drop_grenades_hotkey = ui.new_hotkey("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFDrop Grenades Key"),
+            lab1la2eb222 = label(aa_tab, " "),
+            las12leb222 = label(aa_tab, " "),
+            lab1f2leb222 = label(aa_tab, " "),
+            lab123leb222 = label(aa_tab, " "),
+            lab125leb222 = label(aa_tab, " "),
+            lab1l2eb222 = label(aa_tab, " "),
         },
         extras = {
             text = ui.new_checkbox("LUA","B","Icon_extra"),
@@ -714,30 +780,6 @@
     presets,slow_turtle = {}, renderer.load_svg('<svg width="800" height="800" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="iconify iconify--noto"><path d="M112.7 59.21s3.94-2.21 4.93-2.77c.99-.56 4.6-2.82 5.91-.84.77 1.16-.7 4.44-3.05 7.86-2.14 3.13-7.12 9.56-7.4 10.83-.28 1.27 1.11 6.36 1.53 8.33.42 1.97 1.74 6.71 1.17 8.54s-3.43 6.85-10.75 6.76c-5.82-.07-7.51-1.78-7.7-2.82-.14-.75-.56-3.24-.56-3.24s-4.79 2.96-7.04 4.08-8.31 4.22-8.31 4.22 1.17 5.35 1.36 7.51c.19 2.16.86 5.25-.28 7.32-1.03 1.88-4.25 5.02-11.83 4.97-5.92-.04-7.41-1.88-8.35-3-.94-1.13-1.13-6.48-1.13-7.6s-.19-5.07-.19-5.07-8.02-.4-12.86-.75c-4.38-.32-10.16-.99-10.16-.99s.21 2.33.42 4.01c.19 1.5.23 4.64-1.34 6.17-2.11 2.06-7.56 2.21-10.56 1.92-3-.28-7.18-1.83-8.4-4.55-1.22-2.72.38-6.29 1.03-8.35.58-1.81 1.6-4.41 1.22-5.16-.38-.75-4.04-1.69-9.29-6.95-5.26-5.26-12.13-23.52 3.28-36.23 15.49-12.76 43.81 1.1 45.31 2.04 1.54.96 53.04 3.76 53.04 3.76z" fill="#bdcf47"/><path d="M66.25 25.28c-13.93.62-24.38 7.52-29.57 15.06-3.1 4.5-4.65 7.74-4.65 7.74s4.81.14 9.15 2.46c5 2.67 10.8 5.56 14.61 18.13 2.87 9.5 3.98 18.53 11.44 20.52 8.45 2.25 28.16 1.13 37.59-8.02s11.26-16.05 8.87-25.06-13.17-25.05-28.16-29.28C79.06 25 72.58 25 66.25 25.28z" fill="#6e823a"/><path d="M111.93 51.32c-.42-.99-1.3-2.5-1.3-2.5s-.07 2.05-.25 3.13c-.28 1.76-1.25 5.42-1.81 4.88-1-.97-5.73-6.92-7.98-10.23-1.71-2.52-7.6-9.11-7.74-11.26-.07-1.06 1.27-4.65 1.27-4.65s-1.22-.7-2.35-1.34c-.88-.49-2.16-1.03-2.16-1.03s-.77 4.9-1.62 5.82c-.75.81-5.32 2.6-8.87 3.94-4.29 1.62-8.45 3.73-10 4.01-1.36.25-9.09-1.41-12-1.97-3.66-.7-9.18-2.26-10.45-3.17-1.48-1.06-3.07-3.78-3.07-3.78s-.89.61-1.78 1.31c-.88.69-2.02 2.06-2.02 2.06s2.31 2.32 2.44 3.18c.18 1.2-1.27 2.83-2.46 4.38-.72.93-2.75 4.85-2.75 4.85s.97.09 2.15.63c1.23.57 2.38 1.16 2.38 1.16s2.97-6.9 4.9-7.53c1.65-.54 6.3.99 9.68 1.69 4.79.99 9.64 1.87 10.66 3.17 1.06 1.34 2.06 6.68 3.03 11.19C70.89 64.2 73.64 77.02 73 78c-.63.99-5.7.63-8.59.28-2.45-.3-6.41-1.76-6.41-1.76s.58 2.11.77 2.67c.28.81 1.16 3.06 1.16 3.06s5.67 2.5 22.42.95 25.03-12.96 27.38-18.02c3.14-6.78 3.54-10.39 3.54-10.39s-.92-2.48-1.34-3.47zM96.65 73.21c-4.24 2.67-15.2 5.49-17.18 4.43-1.58-.85-3.94-13.94-5.07-19.78-.72-3.74-2.45-9.42-1.41-11.19.7-1.2 4.79-2.99 7.81-4.4 2.87-1.33 6.97-3.13 8.17-2.99 1.7.2 5.35 6.12 9.01 11.19 3.66 5.07 7.67 10.35 7.74 12.18.09 1.84-4.7 7.82-9.07 10.56z" fill="#484e23"/><path d="M41.18 65.86c.5 2.83-.95 5.75-4.07 6.02-2.56.22-4.59-1.57-5.09-4.4s1.14-5.49 3.68-5.94c2.52-.45 4.98 1.48 5.48 4.32zm-18.36.25c.07 2.84-2.42 5.69-5.5 5.11-2.53-.48-3.99-2.73-3.71-5.55.29-2.82 2.59-4.9 5.15-4.65s3.99 2.13 4.06 5.09zm7.95 10.48c1.16-.79 3.1-2.67 4.36-1.06 1.27 1.62-.92 3.1-2.18 4.01-1.27.92-4.08 3.17-6.12 3.17-1.9 0-4.79-2.32-6.62-3.87-1.49-1.26-2.18-2.89-1.34-3.87s2.14-.62 3.24.35c1.27 1.13 3.72 3.38 4.72 3.38.98.01 2.39-1.05 3.94-2.11z" fill="#2a2b28"/></svg>', 100, 100)
 
 
-    --[[local function initDatabase()
-        if database.read(lua.database.configs) == nil then
-            database.write(lua.database.configs, {})
-        end
-
-        local link = "https://pastebin.com/raw/11vQhZaS"
-        http.get(link, function(success, response)
-            if not success then
-                print("Failed to get presets")
-                return
-            end
-
-            writefile("default_cfg.txt", response.body)
-        
-            data = json.parse(response.body)
-        
-            for i, preset in pairs(data.presets) do
-                table.insert(presets, { name = "*"..preset.name, config = preset.config})
-                ui.set(menu.configTab.name, "*"..preset.name)
-            end
-            ui.update(menu.configTab.list, getConfigList())
-        end)
-    end]]
-    --initDatabase()
     local db = {
         lua = "beta",
     }
@@ -938,13 +980,14 @@
         end
 
         ui.set_visible(menu.miscTab.clantag_mode, ui.get(menu.miscTab.clanTag) and (isMiscTab and isEnabled))
-        ui.set_visible(menu.miscTab.clantagdur, ui.get(menu.miscTab.clanTag) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.console_logs_resolver, ui.get(menu.miscTab.console_logs_custom_vibor) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.auto_smoke_bind, ui.get(menu.miscTab.auto_smoke) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.auto_smoke_cam, ui.get(menu.miscTab.auto_smoke) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.colorchinareal, ui.get(menu.miscTab.enablechina) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.gradientchina, ui.get(menu.miscTab.enablechina) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.speedchina, ui.get(menu.miscTab.gradientchina) and (isMiscTab and isEnabled))
+        ui.set_visible(menu.miscTab.drop_grenades_hotkey, ui.get(menu.miscTab.drop_grenades_helper) and (isMiscTab and isEnabled))
+        ui.set_visible(menu.miscTab.settingsmatchqwe, ui.get(menu.miscTab.settingsmatch) and (isMiscTab and isEnabled))
         ui.set_visible(menu.miscTab.vgui_color, ui.get(menu.miscTab.vgui_color_checkbox) and (isMiscTab and isEnabled))
         ui.set_visible(menu.visualsTab.molotov_radius_reference, ui.get(menu.visualsTab.grenade_radius) and (isVisualsTab and isEnabled))
         ui.set_visible(menu.visualsTab.smoke_radius_reference, ui.get(menu.visualsTab.grenade_radius) and (isVisualsTab and isEnabled))
@@ -954,6 +997,9 @@
         ui.set_visible(menu.visualsTab.animates_left_down, ui.get(menu.visualsTab.snowball) and (isVisualsTab and isEnabled))
         ui.set_visible(menu.visualsTab.snowflake_count, ui.get(menu.visualsTab.snowball) and (isVisualsTab and isEnabled))
         ui.set_visible(menu.visualsTab.snowflake_speed, ui.get(menu.visualsTab.snowball) and (isVisualsTab and isEnabled))
+        ui.set_visible(menu.visualsTab.animate_left_down, ui.get(menu.visualsTab.fireball) and (isVisualsTab and isEnabled))
+        ui.set_visible(menu.visualsTab.fireball_count, ui.get(menu.visualsTab.fireball) and (isVisualsTab and isEnabled))
+        ui.set_visible(menu.visualsTab.fireball_speed, ui.get(menu.visualsTab.fireball) and (isVisualsTab and isEnabled))
         ui.set_visible(menu.visualsTab.bul_dur, ui.get(menu.visualsTab.bul_trace) and (isVisualsTab and isEnabled))
         ui.set_visible(menu.visualsTab.bul_color, ui.get(menu.visualsTab.bul_trace) and (isVisualsTab and isEnabled))
         ui.set_visible(menu.visualsTab.rgb_tracers, ui.get(menu.visualsTab.bul_trace) and (isVisualsTab and isEnabled))
@@ -1596,36 +1642,32 @@
 
             menu.visualsTab.zeus_warning;
             menu.visualsTab.ammo_low;
+            menu.visualsTab.snowball;
+            menu.visualsTab.snowflake_speed;
+            menu.visualsTab.snowflake_count;
+            menu.visualsTab.animates_left_down;
             menu.visualsTab.third_;
             menu.visualsTab.third_dis;
+            menu.visualsTab.trace_color;
+            menu.visualsTab.trace_target;
             menu.visualsTab.min_text;
             menu.visualsTab.asp;
             menu.visualsTab.asp_v;
-            menu.visualsTab.watermarkClr;
             menu.visualsTab.gs_ind;
             menu.visualsTab.arows_txt;
             menu.visualsTab.arows_txt_color;
             menu.visualsTab.arows_txt_offset;
-
             menu.visualsTab.on_screen_logs;
             menu.visualsTab.slow_down;
             menu.visualsTab.on_screen_v;
             menu.visualsTab.widgets_slow;
             menu.visualsTab.widgets_slow_length;
             menu.visualsTab.widgets_slow_width;
-            menu.visualsTab.a_pitch;
-            menu.visualsTab.a_body;
-            menu.visualsTab.ap_move;
-            menu.visualsTab.ap_air;
         },
         misc = {
             menu.miscTab.fast_ladder;
             menu.miscTab.jump_scout;
             menu.miscTab.charge_dt;
-            menu.miscTab.ai_peek;
-            menu.miscTab.ai_peek_key;
-            menu.miscTab.air_stop;
-            menu.miscTab.air_stop_k;
             menu.miscTab.filtercons;
             menu.miscTab.clanTag;
             menu.miscTab.clantag_mode;
@@ -1634,6 +1676,13 @@
             menu.miscTab.console_logs_custom_vibor;
             menu.miscTab.console_logs_resolver;
             menu.miscTab.bomb_fix;
+            menu.miscTab.hidechatbox;
+            menu.miscTab.enablechina;
+            menu.miscTab.colorchinareal;
+            menu.miscTab.gradientchina;
+            menu.miscTab.speedchina;
+            menu.miscTab.vgui_color_checkbox;
+            menu.miscTab.vgui_color;
             menu.miscTab.auto_smoke;
             menu.miscTab.auto_smoke_cam;
             menu.miscTab.auto_smoke_bind;
@@ -1673,30 +1722,66 @@
         clipboard.set(base64.encode(json.stringify(Code)))
     end);
 
-    ui.set_callback(menu.configTab.import, function ()
-        local protected = function() 
-            for k, v in pairs(json.parse(base64.decode(clipboard.get()))) do
-                
-                k = ({[1] = "anti_aim", [2] = "aa_other", [3] = "visuals", [4] = "misc"})[k]
-
-                for k2, v2 in pairs(v) do
-                    if (k == "anti_aim" or k == "aa_other" or k == "visuals" or k == "misc") then
-                        if v2 == "true" then
-                            ui.set(velours.config_data.cfg_data[k][k2], true)
-                        elseif v2 == "false" then
-                            ui.set(velours.config_data.cfg_data[k][k2], false)
-                        else
-                            ui.set(velours.config_data.cfg_data[k][k2], v2)
+    ui.set_callback(menu.configTab.import, function()
+        local protected = function()
+            local clipboard_data = clipboard.get()
+            local decoded_data = base64.decode(clipboard_data)
+    
+            if not decoded_data then
+                error("Error: Data after decode = nil.")
+                return
+            end
+    
+            local status, json_data = pcall(json.parse, decoded_data)
+    
+            if not status then
+                error("[DEBUG] Error by parsin g JSON: " .. json_data)
+                return
+            end
+    
+            -- Сопоставление индексов с названиями секций
+            local sections = {
+                [1] = "anti_aim",
+                [2] = "aa_other",
+                [3] = "visuals",
+                [4] = "misc"
+            }
+    
+            -- Обработка каждой секции конфига
+            for index, values in pairs(json_data) do
+                local section_name = sections[index]
+                if section_name and velours.config_data.cfg_data[section_name] then
+                    local section_data = velours.config_data.cfg_data[section_name]
+                    local i = 1
+                    for _, value in pairs(values) do
+                        local config_item = next(section_data, nil)
+                        for _ = 2, i do
+                            config_item = next(section_data, config_item)
                         end
+    
+                        if config_item and section_data[config_item] then
+                            pcall(function()
+                                if value == "true" then
+                                    ui.set(section_data[config_item], true)
+                                elseif value == "false" then
+                                    ui.set(section_data[config_item], false)
+                                else
+                                    ui.set(section_data[config_item], value)
+                                end
+                            end)
+                        end
+                        i = i + 1
                     end
                 end
             end
         end
+    
         local status, message = pcall(protected)
         if not status then
-            error("error cfg")
+            notifications.new("Error import config.", 255, 0, 0)
             return
         end
+        notifications.new("Config imported successfully", 0, 255, 0)
     end)
 
 
@@ -3700,7 +3785,7 @@
 
     local skeetclantag = ui.reference('MISC', 'MISCELLANEOUS', 'Clan tag spammer')
 
-    local duration = ui.get(menu.miscTab.clantagdur)
+    local duration = 30
     local clantags = {
 
     'T',
@@ -5885,6 +5970,149 @@ ui.set_callback(menu.visualsTab.snowball, function()
     if ui.get(menu.visualsTab.snowball) then
         initialize_snowflakes()
     end
+end)
+
+fireballs = {}
+
+function create_fireball()
+    return {
+        x = math.random(0, client.screen_size()),
+        y = math.random(-50, 0),
+        size = math.random(2, 5),
+        speed = math.random(ui.get(menu.visualsTab.fireball_speed))
+    }
+end
+
+function initialize_fireballs()
+    fireballs = {}
+    for i = 1, ui.get(menu.visualsTab.fireball_count) do
+        table.insert(fireballs, create_fireball())
+    end
+end
+
+function update_fireballs()
+    if not ui.get(menu.visualsTab.fireball) then return end
+
+    for i, fireball in ipairs(fireballs) do
+        if ui.get(menu.visualsTab.animate_left_down) then
+            fireball.x = fireball.x - fireball.speed * 0.5
+            fireball.y = fireball.y + fireball.speed
+        else
+            fireball.y = fireball.y + fireball.speed
+        end
+
+        if fireball.y > client.screen_size() or fireball.x < 0 then
+            fireballs[i] = create_fireball()
+        end
+    end
+end
+
+
+function render_fireballs()
+    if not ui.get(menu.visualsTab.fireball) then return end
+
+    for _, flake in ipairs(fireballs) do
+        renderer.rectangle(flake.x, flake.y, flake.size, flake.size, 255, 69, 0, 255)
+    end
+end
+
+client.set_event_callback("paint", function()
+    update_fireballs()
+    render_fireballs()
+end)
+
+ui.set_callback(menu.visualsTab.fireball_count, initialize_fireballs)
+ui.set_callback(menu.visualsTab.fireball_speed, initialize_fireballs)
+ui.set_callback(menu.visualsTab.fireball, function()
+    if ui.get(menu.visualsTab.fireball) then
+        initialize_fireballs()
+    end
+end)
+
+function update_checkboxes()
+    if ui.get(menu.visualsTab.fireball) then
+        ui.set(menu.visualsTab.snowball, false)
+        ui.set_visible(menu.visualsTab.snowball, true)
+        ui.set_enabled(menu.visualsTab.snowball, false)
+    elseif ui.get(menu.visualsTab.snowball) then
+        ui.set(menu.visualsTab.fireball, false)
+        ui.set_visible(menu.visualsTab.fireball, true)
+        ui.set_enabled(menu.visualsTab.fireball, false)
+    else
+        ui.set_enabled(menu.visualsTab.fireball, true)
+        ui.set_enabled(menu.visualsTab.snowball, true)
+    end
+end
+
+ui.set_callback(menu.visualsTab.fireball, function()
+    update_checkboxes()
+end)
+
+ui.set_callback(menu.visualsTab.snowball, function()
+    update_checkboxes()
+end)
+
+update_checkboxes()
+
+isWaitingForSelection = false
+
+ui.set_callback(menu.miscTab.settingsmatchqwe, function()
+    if isWaitingForSelection then
+        local selected = ui.get(menu.miscTab.settingsmatchqwe)
+        if selected == "Test CFG" then
+            client.exec([[
+                sv_cheats 1;
+                sv_regeneration_force_on 1;
+                mp_limitteams 0;
+                mp_autoteambalance 0;
+                mp_roundtime 60;
+                mp_roundtime_defuse 60;
+                mp_maxmoney 60000;
+                mp_startmoney 60000;
+                mp_freezetime 0;
+                mp_buytime 9999;
+                mp_buy_anywhere 1;
+                sv_infinite_ammo 1;
+                ammo_grenade_limit_total 5;
+                bot_kick;
+                bot_stop 1;
+                mp_warmup_end;
+                mp_restartgame 1;
+                mp_respawn_on_death_ct 1;
+                mp_respawn_on_death_t 1;
+                sv_airaccelerate 100;
+            ]])
+        end
+        isWaitingForSelection = false
+    end
+end)
+
+ui.set_callback(menu.miscTab.settingsmatch, function()
+    local isChecked = ui.get(menu.miscTab.settingsmatch)
+    
+    if isChecked then
+        isWaitingForSelection = true
+    else
+        isWaitingForSelection = false
+    end
+end)
+
+is_dropping = false
+
+client.set_event_callback("setup_command", function(cmd)
+    if not ui.get(menu.miscTab.drop_grenades_helper) or not ui.get(menu.miscTab.drop_grenades_hotkey) then return end
+    
+    if is_dropping then return end
+
+    is_dropping = true
+
+    client.exec("slot4")
+    client.delay_call(0.2, function()
+        client.exec("drop")
+        client.delay_call(0.5, function()
+            is_dropping = false
+        end)
+    end)
 end)
 
 
