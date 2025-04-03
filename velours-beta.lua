@@ -417,8 +417,6 @@
             gesdsfdsasdn_label = label(fl_tab, "\v•\r \affc0cbffAnti-Aim Binds"),
             genasdfsdd_label_line = label(fl_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
             label333 = label(fl_tab, "\aFFFFFFFF•  \aFFFFFFFFBinds"),
-            freestandlabel = label(fl_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFFreestand"),
-            freestandHotkey = ui.new_hotkey("AA", "Fake lag", "\aF88BFFFF:3 ~ \aFFFFFFFFFreestand", true),
             legitAAHotkey = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFLegit AA"),
             m_left = ui.new_hotkey("AA", "Fake lag", "\aF88BFFFF:3 ~ \aFFFFFFFFManual left"),
             m_right = ui.new_hotkey("AA", "Fake lag", "\aF88BFFFF:3 ~ \aFFFFFFFFManual right"),
@@ -1614,7 +1612,6 @@
         aa_other = {
             menu.aaTab.anti_knife;
             menu.aaTab.avoid_dist;
-            menu.aaTab.freestandHotkey;
             menu.aaTab.legitAAHotkey;
             menu.aaTab.m_left;
             menu.aaTab.m_right;
@@ -2224,7 +2221,6 @@
         local isFd = ui.get(refs.fakeDuck)
         local isDt = ui.get(refs.dt[1]) and ui.get(refs.dt[2])
         local isFl = ui.get(ref_ui("AA", "Fake lag", "Enabled"))
-        local isFs1 = ui.get(menu.aaTab.freestandHotkey)
         local legitAA = false
         local man_aa = ui.get(menu.aaTab.m_left) or ui.get(menu.aaTab.m_right)
 
@@ -2236,7 +2232,6 @@
         if not pStill and entity.get_prop(vars.localPlayer, "m_flDuckAmount") > 0.1 then vars.pState = 8 end
         if not onground then vars.pState = 6 end
         if not onground and entity.get_prop(vars.localPlayer, "m_flDuckAmount") > 0.1 then vars.pState = 7 end
-        if isFs1 then vars.pState = 10 end
 
 
         if ui.get(aaBuilder[9].enableState) and not func.table_contains(ui.get(aaBuilder[9].stateDisablers), vars.intToS[vars.pState]) and isDt == false and isOs == false and isFl == true then
@@ -2282,13 +2277,6 @@
         ui.set(refs.yawBase, "At targets")
 
         
-        if ui.get(menu.aaTab.freestandHotkey) then
-            ui.set(refs.freeStand[2], "Always on")
-            ui.set(refs.freeStand[1], true)
-        else
-            ui.set(refs.freeStand[1], false)
-            ui.set(refs.freeStand[2], "On hotkey")
-        end
         local nextAttack = entity.get_prop(vars.localPlayer, "m_flNextAttack")
         local nextPrimaryAttack = entity.get_prop(entity.get_player_weapon(vars.localPlayer), "m_flNextPrimaryAttack")
         local dtActive = false
@@ -3557,7 +3545,6 @@
             dtActive = not (math.max(nextPrimaryAttack, nextAttack) > globals.curtime())
         end
         local isCharged = dtActive
-        local isFs = ui.get(menu.aaTab.freestandHotkey)
         local isBa = ui.get(refs.forceBaim)
         local isSp = ui.get(refs.safePoint)
         local isQp = ui.get(refs.quickPeek[2])
