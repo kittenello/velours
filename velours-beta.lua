@@ -4837,6 +4837,7 @@ function renderer_trace_positions()
     end
 
 
+
 intersect = function(x, y, w, h)
     local cx, cy = ui.mouse_position()
     return cx >= x and cx <= x + w and cy >= y and cy <= y + h
@@ -6529,7 +6530,6 @@ end
 end)
 
 
--- Add state detection and hitchance override logic
 
 -- Переменная для хранения оригинального значения хитчанса
 original_hitchance = nil
@@ -6580,6 +6580,10 @@ elseif original_hitchance then
     ui.set(refs.hitChance, original_hitchance)
     original_hitchance = nil
 end
+end)
+
+client.set_event_callback("paint_ui", function()
+renderer.indicator(164, 158, 229, 255, ui.get(menu.visualsTab.custom_indicator))
 end)
 
 
