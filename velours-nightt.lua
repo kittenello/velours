@@ -4372,7 +4372,7 @@ client.set_event_callback("paint_ui", function()
     if hat_selection == "None" or hat_selection ~= "China" then 
         return 
     end
-    
+
     world_circle({entity.hitbox_position(lp(), 0)}, 10)
 end)
 
