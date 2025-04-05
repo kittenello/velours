@@ -183,6 +183,8 @@ local ui_elements = {
         buybot_primary = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Primary", get_names(primary_weapons)),
         buybot_pistol = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Secondary", get_names(secondary_weapons)),
         buybot_gear = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Gear", get_names(gear_weapons)),
+        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFNickName Exploit Changer"),
+        nameg = ui_textbox(group,, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -4375,6 +4377,20 @@ client.set_event_callback("paint_ui", function()
 end)
 
 -- КОНЕЦ НИМБА
+
+pname = "t.me/velourscsgo"
+
+client.set_event_callback("paint", function()
+    if ui_elements.buybotik.spamenabled:get() then
+        local getcname = ui_elements.buybotik.nameg:get()
+
+        if getcname and getcname ~= '' then
+            pname = getcname
+        end
+        client.set_cvar("name", "\x81 "..pname)
+        client.set_cvar("voice_loopback", client.get_cvar("voice_loopback") == "0" and "1" or "0")
+end
+end)
 
 client.set_event_callback("shutdown", onshutdown)
 client.set_event_callback("run_command", hidechat)
