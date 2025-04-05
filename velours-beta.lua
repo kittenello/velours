@@ -554,8 +554,8 @@ local menu = {
         gen_labeghghl_line = label(other_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
         a_pitch = switch(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFPitch 0 on land"),
         a_body = switch(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFBody lean"),
-        ap_move = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFMove legs", {"None", "Static", "Jitter", "Moonwalk"}),
-        ap_air = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAir legs", {"None", "Falling", "Moonwalk", "Kangaroo", "Earthquake"}),
+        --ap_move = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFMove legs", {"None", "Static", "Jitter", "Moonwalk"}),
+        --ap_air = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAir legs", {"None", "Falling", "Moonwalk", "Kangaroo", "Earthquake"}),
         fu8ayafsyu8n = label(fl_tab, " "),
         b3837372 = label(aa_tab, "       "),
     },
@@ -3128,58 +3128,58 @@ event_callback("pre_render", function(cmd)
         return jitter_factor * 100
     end
 
-    if ui.get(menu.visualsTab.ap_move) == "Jitter" and onground then
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, tickcount() % 4 > 1 and 0 or 1)
-        ui.set(refs.legMovement, "Always slide")
-    elseif ui.get(menu.visualsTab.ap_move) == "Static" and onground then
-        ui.set(refs.legMovement, "Always slide")
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 0)
-    elseif ui.get(menu.visualsTab.ap_move) == "Moonwalk" and onground then
-        ui.set(refs.legMovement, "Never slide")
-        if not legsSaved then
-            legsSaved = ui.get(refs.legMovement)
-        end
-        ui.set_visible(refs.legMovement, false)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
-        me = c_ent.get_local_player()
-        flags = me:get_prop("m_fFlags")
-        onground = bit.band(flags, 1) ~= 0
-        if onground then
-            my_animlayer = me:get_anim_overlay(6)
-            my_animlayer.weight = 1
-            my_animlayer.cycle = globals.realtime() * 0.5 % 1
-        end
-    end
+    --if ui.get(menu.visualsTab.ap_move) == "Jitter" and onground then
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, tickcount() % 4 > 1 and 0 or 1)
+    --    ui.set(refs.legMovement, "Always slide")
+    --elseif ui.get(menu.visualsTab.ap_move) == "Static" and onground then
+    --    ui.set(refs.legMovement, "Always slide")
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 0)
+    --elseif ui.get(menu.visualsTab.ap_move) == "Moonwalk" and onground then
+    --    ui.set(refs.legMovement, "Never slide")
+    --   if not legsSaved then
+    --        legsSaved = ui.get(refs.legMovement)
+    --    end
+    --    ui.set_visible(refs.legMovement, false)
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
+    --    me = c_ent.get_local_player()
+    --    flags = me:get_prop("m_fFlags")
+    --    onground = bit.band(flags, 1) ~= 0
+    --    if onground then
+    --        my_animlayer = me:get_anim_overlay(6)
+    --        my_animlayer.weight = 1
+    --        my_animlayer.cycle = globals.realtime() * 0.5 % 1
+    --    end
+    --end
 
-    if ui.get(menu.visualsTab.ap_air) == "Falling" and not onground then
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 6) 
-    elseif ui.get(menu.visualsTab.ap_air) == "Moonwalk" and not onground then
-        ui.set(refs.legMovement, "Never slide")
-        if not legsSaved then
-            legsSaved = ui.get(refs.legMovement)
-        end
-        ui.set_visible(refs.legMovement, false)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
-        me = c_ent.get_local_player()
-        flags = me:get_prop("m_fFlags")
-        onground = bit.band(flags, 1) ~= 0
-        if not onground then
-            my_animlayer = me:get_anim_overlay(6)
-            my_animlayer.weight = 1
-            my_animlayer.cycle = globals.realtime() * 0.5 % 1
-        end
-    elseif ui.get(menu.visualsTab.ap_air) == "Kangaroo" and not onground then
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 1)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
-    elseif ui.get(menu.visualsTab.ap_air) == "Earthquake" and not onground then
-        local self_anim_overlay = self_index:get_anim_overlay(12)
-        if not self_anim_overlay then return end
+    --if ui.get(menu.visualsTab.ap_air) == "Falling" and not onground then
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 6) 
+    --elseif ui.get(menu.visualsTab.ap_air) == "Moonwalk" and not onground then
+    --    ui.set(refs.legMovement, "Never slide")
+    --   if not legsSaved then
+    --        legsSaved = ui.get(refs.legMovement)
+    --    end
+    --    ui.set_visible(refs.legMovement, false)
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
+    --    me = c_ent.get_local_player()
+    --    flags = me:get_prop("m_fFlags")
+    --    onground = bit.band(flags, 1) ~= 0
+    --    if not onground then
+    --        my_animlayer = me:get_anim_overlay(6)
+    --        my_animlayer.weight = 1
+    --        my_animlayer.cycle = globals.realtime() * 0.5 % 1
+    --    end
+    --elseif ui.get(menu.visualsTab.ap_air) == "Kangaroo" and not onground then
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
+    --   entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 1)
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
+    --elseif ui.get(menu.visualsTab.ap_air) == "Earthquake" and not onground then
+    --    local self_anim_overlay = self_index:get_anim_overlay(12)
+    --    if not self_anim_overlay then return end
 
-        if globals.tickcount() % 90 > 1 then
-            self_anim_overlay.weight = jitter_value() / 100
-        end
-    end
+    --    if globals.tickcount() % 90 > 1 then
+    --        self_anim_overlay.weight = jitter_value() / 100
+    --    end
+    --end
 
 
     if ui.get(menu.visualsTab.a_pitch) then
