@@ -183,7 +183,7 @@ local ui_elements = {
         buybot_primary = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Primary", get_names(primary_weapons)),
         buybot_pistol = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Secondary", get_names(secondary_weapons)),
         buybot_gear = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Gear", get_names(gear_weapons)),
-        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFNickName Exploit Changer"),
+        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153NickName Exploit Changer\aFFFFFFFF"),
         nameg = ui_textbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
     },
     ragebotik = {
