@@ -202,6 +202,11 @@ local ui_elements = {
         auto_hideshots_wpns = ui_multiselect(group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFAutomatic Hideshots Weapons", {"Pistol", "Scout", "Scar", "Rifle", "SMG", "Machinegun", "Shotgun"}),
         unsafe_discharge = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFUnsafe Discharge In Air"),
         doubletapgood = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFBetter FakeDuck"),
+        gedfsgsd1fgn_lagdsfgdgdhghbel = ui_label(fl_tab, "\v•\r \affc0cbffAddictional Hitchance"),
+        gensdf1g_labeghghl_line = ui_label(fl_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
+        additional_hitchance = ui_checkbox(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAdditional HitChance"),
+        hitchance_states = ui_multiselect(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFStates", {"Global", "Standing", "Running", "Moving", "Crouching", "Air", "Air+C", "Sneaking", "On FL", "On FS"}),
+        hitchance_value = ui_slider("AA", "Other", "\aF88BFFFF:3 ~ \aFFFFFFFFHitChance Value", 1, 100, 50, true, "%", 1),
     },
     anti_aims = {
         label_space = ui_label(main_group, "\n\n\n"),
@@ -519,6 +524,7 @@ local aa_refs = {
     autostrafer = ui_reference("misc", "movement", "Air strafe"),
     aimbot = ui_reference("RAGE", "Aimbot", "Enabled"),
     fakePeek = ui_reference("AA", "other", "Fake Peek"),
+    hitchance = ui_reference("RAGE", "Aimbot", "Minimum hit chance"),
     log_misses = ui_reference("RAGE", "Other", "Log misses due to spread"),
     accuracy_boost = ui_reference("RAGE", "Other", "Accuracy boost"),
 }
@@ -4389,6 +4395,58 @@ client.set_event_callback("paint", function()
         end
         client.set_cvar("name", "\x81 "..pname)
         client.set_cvar("voice_loopback", client.get_cvar("voice_loopback") == "0" and "1" or "0")
+end
+end)
+
+-- Переменная для хранения оригинального значения хитчанса
+original_hitchance = nil
+
+-- Функция определения текущего состояния
+function get_current_state()
+local localplayer = entity.get_local_player()
+if not localplayer then return "Global" end
+
+local flags = entity.get_prop(localplayer, "m_fFlags")
+local on_ground = bit.band(flags, 1) ~= 0
+local ducking = bit.band(flags, 4) ~= 0
+local velocity = vector(entity.get_prop(localplayer, "m_vecVelocity"))
+local speed = math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y)
+
+if not on_ground then
+    return ducking and "Air+C" or "Air"
+elseif ducking then
+    return "Crouching"
+elseif speed > 5 then
+    return speed > 100 and "Running" or "Moving"
+elseif speed < 5 then
+    return "Standing"
+end
+
+return "Global"
+end
+
+-- Callback для управления хитчансом
+client.set_event_callback("setup_command", function()
+if not ui_elements.ragebotik.additional_hitchance:get() then 
+    if original_hitchance then
+        aa_refs.hitchance:set(original_hitchance)
+        original_hitchance = nil
+    end
+    return 
+end
+
+local current_state = get_current_state()
+local selected_states = ui_elements.ragebotik.hitchance_states:get()
+
+if func.table_contains(selected_states, current_state) then
+    if not original_hitchance then
+        original_hitchance = aa_refs.hitchance:get()
+    end
+    yaw_base:set("At targets")
+    aa_refs.hitchance:set(ui_elements.ragebotik.hitchance_value:get())
+elseif original_hitchance then
+    aa_refs.hitchance:set(original_hitchance)
+    original_hitchance = nil
 end
 end)
 
