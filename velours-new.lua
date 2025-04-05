@@ -99,10 +99,8 @@ function get_random_text()
     return random_texts[math.random(#random_texts)]
 end
 
-
-
 client.set_event_callback("paint_ui", function()
-     renderer.indicator(164, 158, 229, 255, 'VELOURS.LUA')
+    renderer.indicator(164, 158, 229, 255, 'VELOURS.LUA')
 end)
 
 
@@ -111,9 +109,9 @@ local w, h = client_screen_size()
 local group = ui.group("AA", "Anti-aimbot angles")
 local main_group = ui.group("AA", "Fake lag")
 local other_group = ui.group("AA", "Other")
-local aa_states = {"Shared", "Stand", "Run", "Air", "C-Air", "Slowwalk", "Crouch", "C-MOVE", "Break LC", "Warmup", "TP"}
+local aa_states = {"Global", "Stand", "Run", "Air", "C-Air", "Slowwalk", "Crouch", "C-MOVE", "Break LC", "Warmup", "TP"}
 local short_names = {"SH", "S", "R", "A", "C-A", "SL", "C", "C-M", "LC", "W", "TP"}
-local indicator_names = {"shared", "stand", "run", "air", "c-air", "S-Walk", "crouch", "C-MOVE", "LC", "WP", "TP"}
+local indicator_names = {"global", "stand", "run", "air", "c-air", "S-Walk", "crouch", "C-MOVE", "LC", "WP", "TP"}
 local warning = images.load_svg([[<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
 <path style="fill:#ffffff; stroke:none;" d="M292 145C259.262 145 226.667 150.478 194 151.961C180.035 152.595 159.349 150.927 148.015 160.34C138.424 168.305 137.329 181.64 134.525 193C128.692 216.637 123.278 240.38 117.373 264C114.357 276.068 109.358 288.824 114.479 301C122.682 320.504 148.539 321.148 160.876 305.961C170.872 293.655 172.169 270.173 175.651 255C179.362 238.83 184.787 222.434 187 206L232 207C225.396 241.052 218.203 274.989 211.4 309C208.526 323.365 207.92 344.39 200.451 357C177.59 395.599 151.133 432.616 126.333 470C117.47 483.359 98.8484 502.504 98.0401 519C97.6278 527.416 96.988 536.508 101.349 544C113.109 564.205 141.937 568.976 158.985 552.907C177.54 535.418 190.616 508.728 205.427 488C221.034 466.16 236.646 444.248 251.67 422C259.521 410.373 269.164 398.286 274 385L317 421L317 422C310.531 428.272 306.479 438.206 302 446C292.097 463.231 273.486 484.648 272.091 505C270.471 528.633 294.204 545.433 316 536.525C328.609 531.372 333.975 518.093 340.281 507C354.381 482.196 370.048 457.601 382.627 432C393.077 410.731 379.327 395.327 365 381C351.809 367.809 338.501 354.726 325.196 341.665C319.786 336.354 308.649 329.444 306.407 322C304.339 315.135 313.285 300.52 315.811 294C318.057 288.201 319.913 279.753 324.278 275.204C329.556 269.705 334.869 274.755 340 277.716C352.448 284.9 364.72 294.269 378 299.801C389.796 304.715 401.018 298.753 412 294.399C436.913 284.521 467.123 277.699 490 263.786C498.594 258.56 505.379 247.579 502.529 237.285C498.753 223.641 486.044 218.024 473 219.093C453.366 220.703 430.253 234.5 412 241.8C405.766 244.293 394.612 251.187 388 248.424C376.937 243.803 366.285 235.726 356 229.551C352.573 227.493 346.87 224.993 345.438 220.957C343.372 215.132 347.382 203.732 346.91 197C345.917 182.826 338.076 170.421 329 160C346.212 159.953 364.582 154.617 376.826 141.91C406.512 111.102 396.589 58.2419 357 41.4282C316.627 24.2816 272.195 54.8403 271.129 98C270.689 115.808 279.918 132.662 292 145z"/>
 </svg>]])
@@ -183,7 +181,7 @@ local ui_elements = {
         buybot_primary = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Primary", get_names(primary_weapons)),
         buybot_pistol = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Secondary", get_names(secondary_weapons)),
         buybot_gear = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Gear", get_names(gear_weapons)),
-        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153NickName Exploit Changer\aFFFFFFFF"),
+        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Exploit Changer\aFFFFFFFF"),
         nameg = ui_textbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
     },
     ragebotik = {
@@ -202,6 +200,12 @@ local ui_elements = {
         auto_hideshots_wpns = ui_multiselect(group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFAutomatic Hideshots Weapons", {"Pistol", "Scout", "Scar", "Rifle", "SMG", "Machinegun", "Shotgun"}),
         unsafe_discharge = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFUnsafe Discharge In Air"),
         doubletapgood = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFBetter FakeDuck"),
+        kkdfsgkjod = ui_label(main_group, " "),
+        gedfsgsd1fgn_lagdsfgdgdhghbel = ui_label(main_group, "\v•\r \affc0cbffAddictional Hitchance"),
+        gensdf1g_labeghghl_line = ui_label(main_group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
+        additional_hitchance = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFAdditional HitChance"),
+        hitchance_states = ui_multiselect(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFStates", {"Global", "Standing", "Running", "Moving", "Crouching", "Air", "Air+C", "Sneaking", "On FL", "On FS"}),
+        hitchance_value = ui_slider(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFHitChance Value", 1, 100, 50, true, "%", 1),
     },
     anti_aims = {
         label_space = ui_label(main_group, "\n\n\n"),
@@ -261,7 +265,7 @@ local ui_elements = {
         hitmarker_s_cl = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSecond Color", {0,255,0}),
         hitlogs = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHitlogs"),
         output = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFDisplay", {"On screen", "Console"}),
-        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Anti-brute"}),
+        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Anti-brute", "Purchase"}),
         custom_res = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason Miss"),
         custom_reason = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason '?'", {"resolver", "kitty :3", "desync", "lagcomp failure", "spread", "occlusion", "wallshot failure", "unprediction error", "unregistered shot", "Custom"}),
         bullet_tracer = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFBullet Tracer", {255, 255, 255}),
@@ -322,8 +326,6 @@ local ui_elements = {
         distance_slider = ui_slider(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFDistance Avoid-Backstab", 0, 500, 230, true),
         optimizatica = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFFPS Optimization"),
         hidechatbox = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFHide Chat"),
-        taskbarnotify = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaskbar Notify on Round Start"),
-        taskbarnotifyend = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaskbar Notify on Round End"),
         auto_smoke = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Smoke [BETA]"),
         auto_smoke_bind = ui_hotkey(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Smoke Hotkey"),
         auto_smoke_cam = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFNo Restore Camera"),
@@ -346,7 +348,8 @@ local ui_elements = {
         anim_breaker = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFAnimation Breaker"),
         anim_breaker_selection = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFAnim Breaker Selection", {"Backward legs", "Freeze legs in air", "Pitch 0"}),
         killsay = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk"),
-        killsay_type = ui_combobox(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashtalk type", {"Default", "Ad", "Revenge", "Simple 1", "Delayed"}),
+        killsay_type = ui_combobox(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Type", {"None", "Default", "Ad", "Revenge", "Simple 1", "Delayed"}),
+        killsay_add = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss", "Hit"}),
         clantag = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag"),
         clantag_type = ui_combobox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag Type", {"TG: velourscsgo", "velours e3et", "b1g d1ck..:3", "kitty :3", "cum in me >.<"}),
         console_filter = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Filter"),
@@ -519,8 +522,11 @@ local aa_refs = {
     autostrafer = ui_reference("misc", "movement", "Air strafe"),
     aimbot = ui_reference("RAGE", "Aimbot", "Enabled"),
     fakePeek = ui_reference("AA", "other", "Fake Peek"),
+    hitchance = ui_reference("RAGE", "Aimbot", "Minimum hit chance"),
     log_misses = ui_reference("RAGE", "Other", "Log misses due to spread"),
     accuracy_boost = ui_reference("RAGE", "Other", "Accuracy boost"),
+    thirdperson = {ui.reference("Visuals", "Effects", "Force third person (alive)")},
+    logpurchase = ui_reference("Misc", "Miscellaneous", "log weapon purchases"),
 }
 
 local hide_elements = {
@@ -1042,6 +1048,7 @@ ui_elements.settings.hitmarker_s_cl:depend(ui_elements.settings.hitmarker)
 ui_elements.settings.anim_breaker_selection:depend(ui_elements.settings.anim_breaker)
 ui_elements.settings.aspect_ratio_slider:depend(ui_elements.settings.aspect_ratio)
 ui_elements.settings.killsay_type:depend(ui_elements.settings.killsay)
+ui_elements.settings.killsay_add:depend(ui_elements.settings.killsay)
 ui_elements.settings.clantag_type:depend(ui_elements.settings.clantag)
 
 ui_elements.tab:depend(ui_elements.main_check)
@@ -1587,6 +1594,39 @@ death_say = {
     {'всмысле', 'ты же ебучий иван золо', 'ты как играть научился?'}
 }
 
+miss_words = {
+    "как я промазал с позором",
+    "боже я опять мисснул",
+    "НУ ЕБАННАЯ ПАСТА ОПЯТЬ МИСАЕТ СУКА",
+    "заебусь в тебя долбоеба мисать",
+    "я опять миснул? это значит ты облизал мои яйца",
+    "повезет же тебе жирному",
+    "свиноблядь в следующий раз я тебе еблет снесу",
+    "бля, снова в хохла мисснул",
+    "VELOURS FUCKING LEGEND AGAIN MISSED? NOOO",
+    "сука я щас просто возьму и депну твою родню в казик",
+    "я тебе щас нос в голову вобью, хочешь?",
+    "ты настолько беден как адам, что в тебя чит мисснул позорище",
+    "засраный хуедав моржовый ты хули прыгаешь как на члене?",
+    "хех... опять мисс",
+    "это пиздец ты настолько уебан тупой что в тебя чит не хочет стрелять, 1",
+    "мразь ебучая",
+    "НУ ЕБАННЫЙ РЕЗОЛЬВЕР В ЭТОЙ ПАСТЕ КОГДА ЕГО УЖЕ ПОЧИНЯТ?",
+    "але мандариновый жиробас, ты когда прыгать перестанешь?",
+    "ебать я вижу ты в зеркальной броне, раз я в тебя мисснул",
+    "ну да, ну да по цыгану всегда миссает",
+    "о ебать, я вижу ты тоже с velours.lua раз я мисснул по тебе",
+    "ну ладно ладно еушник повезло те, все равно сдохнешь",
+    "раз в год и палка стреляет",
+    "если в тя мисснуло незначит что ты выйграл долбоебище",
+    "nn russian kid opyat proletel and cheat ne strelnel, pidorasina",
+    "кстати когда в тебя миссают ты хоть понимаешь что тя ебут дилдаком в жопу сразу же?",
+    }
+    
+shot_words = {
+    "1"
+}
+
 last_killer = nil
 
 killsay_func = function(e)
@@ -1606,6 +1646,7 @@ killsay_func = function(e)
     end
 
     selected_type = ui_elements.settings.killsay_type:get()
+    add_type = ui_elements.settings.killsay_add:get()
 
     local tbl
     if selected_type == "Default" then
@@ -1620,6 +1661,10 @@ killsay_func = function(e)
         end
     elseif selected_type == "Simple 1" then
         tbl = simple_1
+    elseif add_type == "Miss" then
+        return
+    elseif add_type == "Hit" then
+        return
     elseif selected_type == "Delayed 1" then
         client_delay_call(5, function()
             client_exec("say 1")
@@ -1631,6 +1676,29 @@ killsay_func = function(e)
 
     client_delay_call(1, function()
         client_exec("say " .. tbl[client_random_int(1, #tbl)])
+    end)
+end
+
+includes = function(tbl, value)
+    for i = 1, #tbl do
+        if tbl[i] == value then
+            return true
+        end
+    end
+    return false
+end
+
+function on_aim_miss(e)
+    if not ui_elements.settings.killsay:get() or not includes(ui_elements.settings.killsay_add:get(), "Miss") then return end
+    
+        client.exec("say " .. miss_words[client.random_int(1, #miss_words)])
+    end
+    
+function on_aim_shot(e)
+    if not ui_elements.settings.killsay:get() or not includes(ui_elements.settings.killsay_add:get(), "Hit") then return end
+    
+    client.delay_call(1, function()
+        client.exec("say " .. shot_words[client.random_int(1, #shot_words)])
     end)
 end
 
@@ -1695,6 +1763,8 @@ end)
 
 client.set_event_callback("player_death", killsay_func)
 client.set_event_callback("player_death", track_last_killer)
+client.set_event_callback("aim_miss", on_aim_miss)
+client.set_event_callback("aim_hit", on_aim_shot)
 
 local clantags = {
     ["TG: velourscsgo"] = main_funcs.create_clantag("TG: velourscsgo"),
@@ -2470,6 +2540,35 @@ local hitlogs_module = {
         end
         if not ui_elements.settings.output:get("On screen") then return end
         notification:add(5, ("\a%sHurt\aFFFFFFFF %s in \a%s%s\aFFFFFFFF for \a%s%i\aFFFFFFFF damage (\a%s%i\aFFFFFFFF health remaining)"):format(hex, name, hex, hitgroup, hex, e.damage, hex, health))
+    end,
+    item_purchase = function(e)
+        if not ui_elements.main_check.value or not ui_elements.settings.hitlogs.value or not ui_elements.settings.type:get("Purchase") then return end
+    
+        local userid = e.userid
+        local team = e.team
+        local weapon = e.weapon
+    
+        local player_index = client_userid_to_entindex(userid)
+    
+        --if player_index == entity_get_local_player() then
+        --    return
+        --end
+    
+        local player_name = entity_get_player_name(player_index):lower()
+        local team_name = team == 2 and "Terrorist" or team == 3 and "Counter-Terrorist" or "Unknown"
+
+        if weapon == "weapon_incgrenade" then weapon = "Molotov (CT)" end
+        if weapon == "weapon_smokegrenade" then weapon = "Smoke" end
+        if weapon == "weapon_hegrenade" then weapon = "HE" end
+        if weapon == "weapon_taser" then weapon = "Zeus" end
+
+        local r, g, b = ui_elements.main.main_color.color:get()
+        local hex = main_funcs.rgba_to_hex(r, g, b)
+        if ui_elements.settings.output:get("Console") then 
+            console_log(r, g, b, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
+        end
+        if not ui_elements.settings.output:get("On screen") then return end
+        notification:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
     end,
     aim_miss = function(e)
         if not ui_elements.main_check.value or 
@@ -3424,6 +3523,22 @@ end)
 
 update_checkboxes()
 
+function update_real()
+    if ui_elements.settings.type:get("Purchase") then
+        aa_refs.logpurchase:set(false)
+        aa_refs.logpurchase:set_visible(true)
+        aa_refs.logpurchase:set_enabled(false)
+    else
+        aa_refs.logpurchase:set_enabled(true)
+    end
+end
+
+update_real()
+
+ui_elements.settings.type:set_callback(function()
+        update_real()
+end)
+
 function toggle_log_misses_due_to_spread()
     is_miss_selected = ui_elements.settings.type:get("Miss")
 
@@ -4177,7 +4292,7 @@ end)
 -- НИМБ ЕБУЧИЙ
 
 
-thirdperson_ezochka = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
+local thirdperson_china = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
 
 function hsv_to_rgb(h, s, v)
     local r, g, b
@@ -4264,7 +4379,6 @@ client.set_event_callback("paint_ui", function()
         return 
     end
 
-
     local lp = entity.get_local_player()
     if not lp or not entity.is_alive(lp) then
         return
@@ -4282,7 +4396,7 @@ end)
 
 lp = entity.get_local_player
 
-thirdperson_china = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
+local thirdperson_china = {ui.reference("Visuals", "Effects", "Force third person (alive)")}
 
 
 function hsv_to_rgb(h, s, v)
@@ -4372,6 +4486,11 @@ client.set_event_callback("paint_ui", function()
     if hat_selection == "None" or hat_selection ~= "China" then 
         return 
     end
+
+    local lp = entity.get_local_player()
+    if not lp or not entity.is_alive(lp) then
+        return
+    end
     
     world_circle({entity.hitbox_position(lp(), 0)}, 10)
 end)
@@ -4389,6 +4508,67 @@ client.set_event_callback("paint", function()
         end
         client.set_cvar("name", "\x81 "..pname)
         client.set_cvar("voice_loopback", client.get_cvar("voice_loopback") == "0" and "1" or "0")
+end
+end)
+
+-- Переменная для хранения оригинального значения хитчанса
+original_hitchance = nil
+
+-- Функция определения текущего состояния
+function get_current_state()
+local localplayer = entity.get_local_player()
+if not localplayer then return "Global" end
+
+local flags = entity.get_prop(localplayer, "m_fFlags")
+local on_ground = bit.band(flags, 1) ~= 0
+local ducking = bit.band(flags, 4) ~= 0
+local velocity = vector(entity.get_prop(localplayer, "m_vecVelocity"))
+local speed = math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y)
+
+if not on_ground then
+    return ducking and "Air+C" or "Air"
+elseif ducking then
+    return "Crouching"
+elseif speed > 5 then
+    return speed > 100 and "Running" or "Moving"
+elseif speed < 5 then
+    return "Standing"
+end
+
+return "Global"
+end
+
+table_contains = function(table, value)
+    for i = 1, #table do
+        if table[i] == value then
+            return true
+        end
+    end
+    return false
+end
+
+-- Callback для управления хитчансом
+client.set_event_callback("setup_command", function()
+if not ui_elements.ragebotik.additional_hitchance:get() then 
+    if original_hitchance then
+        aa_refs.hitchance:set(original_hitchance)
+        original_hitchance = nil
+    end
+    return 
+end
+
+local current_state = get_current_state()
+local selected_states = ui_elements.ragebotik.hitchance_states:get()
+
+if table_contains(selected_states, current_state) then
+    if not original_hitchance then
+        original_hitchance = aa_refs.hitchance:get()
+    end
+    yaw_base:set("At targets")
+    aa_refs.hitchance:set(ui_elements.ragebotik.hitchance_value:get())
+elseif original_hitchance then
+    aa_refs.hitchance:set(original_hitchance)
+    original_hitchance = nil
 end
 end)
 
@@ -4439,6 +4619,7 @@ ui_elements.settings.hitlogs:set_event('aim_fire', hitlogs_module.aim_fire)
 ui_elements.settings.hitlogs:set_event('aim_hit', hitlogs_module.aim_hit)
 ui_elements.settings.hitlogs:set_event('aim_miss', hitlogs_module.aim_miss)
 ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurt)
+ui_elements.settings.hitlogs:set_event('item_purchase', hitlogs_module.item_purchase)
 ui_elements.settings.console_filter:set_callback(main_funcs.console_filter_f)
 ui_elements.settings.enhance_bt:set_callback(main_funcs.backtrack_f)
 client_delay_call(0.1, function() main_funcs.console_filter_f() main_funcs.viewmodel_changer_func() main_funcs.backtrack_f() end)
