@@ -4533,11 +4533,6 @@ client.set_event_callback("paint_ui", function()
         return 
     end
 
-    local lp = entity.get_local_player()
-    if not lp or not entity.is_alive(lp) then
-        return
-    end
-    
     world_circle({entity.hitbox_position(lp(), 0)}, 10)
 end)
 
