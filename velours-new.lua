@@ -103,8 +103,6 @@ client.set_event_callback("paint_ui", function()
     renderer.indicator(164, 158, 229, 255, 'VELOURS.LUA')
 end)
 
-
-
 local w, h = client_screen_size()
 local group = ui.group("AA", "Anti-aimbot angles")
 local main_group = ui.group("AA", "Fake lag")
@@ -2568,7 +2566,8 @@ local hitlogs_module = {
             console_log(r, g, b, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
         end
         if not ui_elements.settings.output:get("On screen") then return end
-        notification:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
+        notif
+        ication:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
     end,
     aim_miss = function(e)
         if not ui_elements.main_check.value or 
