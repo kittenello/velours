@@ -448,7 +448,7 @@ local menu = {
         min_ind_mode = combo(aa_tab, "\nselect", "Bind", "Always"),
         min_text = combo(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFSize", "Default", "Pixel"),
         on_screen_logs = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFHit-Logs OnScreen"),
-        on_screen_v = list(aa_tab, "\nA", {"Hit", "Miss", "Shot", "Evaded"}),
+        on_screen_v = list(aa_tab, "\nA", {"Hit", "Miss", "Evaded"}),
         on_screen_max = slider("AA", "Anti-aimbot angles", "\aF88BFFFF:3 ~ \aFFFFFFFFMaximum", 1, 10, 4, true, nil, 1),
         arows_txt = switch(aa_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFArrows"),
         arows_txt_color = ui.new_color_picker("AA", container, "\aF88BFFFF:3 ~ \aFFFFFFFFArrows", lua_color.r, lua_color.g, lua_color.b, 255),
@@ -554,8 +554,8 @@ local menu = {
         gen_labeghghl_line = label(other_tab, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
         a_pitch = switch(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFPitch 0 on land"),
         a_body = switch(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFBody lean"),
-        ap_move = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFMove legs", {"None", "Static", "Jitter", "Moonwalk"}),
-        ap_air = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAir legs", {"None", "Falling", "Moonwalk", "Kangaroo", "Earthquake"}),
+        --ap_move = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFMove legs", {"None", "Static", "Jitter", "Moonwalk"}),
+        --ap_air = combo(other_tab, "\aF88BFFFF:3 ~ \aFFFFFFFFAir legs", {"None", "Falling", "Moonwalk", "Kangaroo", "Earthquake"}),
         fu8ayafsyu8n = label(fl_tab, " "),
         b3837372 = label(aa_tab, "       "),
     },
@@ -901,8 +901,8 @@ event_callback("paint_ui", function()
     --local isINFOTab = ui.get(tabPicker) == "Main" and ui.get(iTabs) == "Configs/Main"
     for i = 1, #vars.aaStates do
         local stateEnabled = ui.get(aaBuilder[i].enableState)
-        ui.set_visible(aaBuilder[i].label_huy, vars.activeState == i and isBuilderTab and isEnabled)
-        ui.set_visible(aaBuilder[i].enableState, vars.activeState == i and isBuilderTab and isEnabled)
+        ui.set_visible(aaBuilder[i].label_huy, vars.activeState == i and i~=1 and isBuilderTab and isEnabled)
+        ui.set_visible(aaBuilder[i].enableState, vars.activeState == i and i~=1 and isBuilderTab and isEnabled)
         ui.set_visible(aaBuilder[i].force_defensive, vars.activeState == i and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].defensive_mode, vars.activeState == i and ui.get(aaBuilder[i].force_defensive) and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].defensive_delay, vars.activeState == i and ui.get(aaBuilder[i].force_defensive) and ui.get(aaBuilder[i].defensive_mode) == "Switch" and isBuilderTab and stateEnabled and isEnabled)
@@ -3128,58 +3128,58 @@ event_callback("pre_render", function(cmd)
         return jitter_factor * 100
     end
 
-    if ui.get(menu.visualsTab.ap_move) == "Jitter" and onground then
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, tickcount() % 4 > 1 and 0 or 1)
-        ui.set(refs.legMovement, "Always slide")
-    elseif ui.get(menu.visualsTab.ap_move) == "Static" and onground then
-        ui.set(refs.legMovement, "Always slide")
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 0)
-    elseif ui.get(menu.visualsTab.ap_move) == "Moonwalk" and onground then
-        ui.set(refs.legMovement, "Never slide")
-        if not legsSaved then
-            legsSaved = ui.get(refs.legMovement)
-        end
-        ui.set_visible(refs.legMovement, false)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
-        me = c_ent.get_local_player()
-        flags = me:get_prop("m_fFlags")
-        onground = bit.band(flags, 1) ~= 0
-        if onground then
-            my_animlayer = me:get_anim_overlay(6)
-            my_animlayer.weight = 1
-            my_animlayer.cycle = globals.realtime() * 0.5 % 1
-        end
-    end
+    --if ui.get(menu.visualsTab.ap_move) == "Jitter" and onground then
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, tickcount() % 4 > 1 and 0 or 1)
+    --    ui.set(refs.legMovement, "Always slide")
+    --elseif ui.get(menu.visualsTab.ap_move) == "Static" and onground then
+    --    ui.set(refs.legMovement, "Always slide")
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 0)
+    --elseif ui.get(menu.visualsTab.ap_move) == "Moonwalk" and onground then
+    --    ui.set(refs.legMovement, "Never slide")
+    --   if not legsSaved then
+    --        legsSaved = ui.get(refs.legMovement)
+    --    end
+    --    ui.set_visible(refs.legMovement, false)
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
+    --    me = c_ent.get_local_player()
+    --    flags = me:get_prop("m_fFlags")
+    --    onground = bit.band(flags, 1) ~= 0
+    --    if onground then
+    --        my_animlayer = me:get_anim_overlay(6)
+    --        my_animlayer.weight = 1
+    --        my_animlayer.cycle = globals.realtime() * 0.5 % 1
+    --    end
+    --end
 
-    if ui.get(menu.visualsTab.ap_air) == "Falling" and not onground then
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 6) 
-    elseif ui.get(menu.visualsTab.ap_air) == "Moonwalk" and not onground then
-        ui.set(refs.legMovement, "Never slide")
-        if not legsSaved then
-            legsSaved = ui.get(refs.legMovement)
-        end
-        ui.set_visible(refs.legMovement, false)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
-        me = c_ent.get_local_player()
-        flags = me:get_prop("m_fFlags")
-        onground = bit.band(flags, 1) ~= 0
-        if not onground then
-            my_animlayer = me:get_anim_overlay(6)
-            my_animlayer.weight = 1
-            my_animlayer.cycle = globals.realtime() * 0.5 % 1
-        end
-    elseif ui.get(menu.visualsTab.ap_air) == "Kangaroo" and not onground then
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 1)
-        entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
-    elseif ui.get(menu.visualsTab.ap_air) == "Earthquake" and not onground then
-        local self_anim_overlay = self_index:get_anim_overlay(12)
-        if not self_anim_overlay then return end
+    --if ui.get(menu.visualsTab.ap_air) == "Falling" and not onground then
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 6) 
+    --elseif ui.get(menu.visualsTab.ap_air) == "Moonwalk" and not onground then
+    --    ui.set(refs.legMovement, "Never slide")
+    --   if not legsSaved then
+    --        legsSaved = ui.get(refs.legMovement)
+    --    end
+    --    ui.set_visible(refs.legMovement, false)
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 0, 7)
+    --    me = c_ent.get_local_player()
+    --    flags = me:get_prop("m_fFlags")
+    --    onground = bit.band(flags, 1) ~= 0
+    --    if not onground then
+    --        my_animlayer = me:get_anim_overlay(6)
+    --        my_animlayer.weight = 1
+    --        my_animlayer.cycle = globals.realtime() * 0.5 % 1
+    --    end
+    --elseif ui.get(menu.visualsTab.ap_air) == "Kangaroo" and not onground then
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
+    --   entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 1)
+    --    entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 2)/2, 2)
+    --elseif ui.get(menu.visualsTab.ap_air) == "Earthquake" and not onground then
+    --    local self_anim_overlay = self_index:get_anim_overlay(12)
+    --    if not self_anim_overlay then return end
 
-        if globals.tickcount() % 90 > 1 then
-            self_anim_overlay.weight = jitter_value() / 100
-        end
-    end
+    --    if globals.tickcount() % 90 > 1 then
+    --        self_anim_overlay.weight = jitter_value() / 100
+    --    end
+    --end
 
 
     if ui.get(menu.visualsTab.a_pitch) then
@@ -4549,46 +4549,6 @@ function aim_miss(e)
 end
 
 event_callback("aim_miss", aim_miss)
-
-
-function time_to_ticks(time)
-    return math.floor(0.5 + time / globals.tickinterval())
-end
-
-function on_aim_fire(e)
-    local options = ui.get(menu.visualsTab.on_screen_v)
-    local shot_enabled = false
-    for i=1, #options do
-        if options[i] == "Shot" then
-            shot_enabled = true
-            break
-        end
-    end
-    
-    if not shot_enabled then return end
-
-    local flags = {
-        e.teleported and "T" or "",
-        e.interpolated and "I" or "",
-        e.extrapolated and "E" or "",
-        e.boosted and "B" or "",
-        e.high_priority and "H" or ""
-    }
-
-    local group = hitgroup_names[e.hitgroup + 1] or "?"
-    
-    notifications.new(string.format(
-        "Shot at %s in %s for %d dmg (hc=%d%%, bt=%2d, flags=%s)",
-        entity.get_player_name(e.target), 
-        group, 
-        e.damage,
-        math.floor(e.hit_chance + 0.5), 
-        globals.tickcount() - e.tick,
-        table.concat(flags)
-    ), 255, 255, 255, 255)
-end
-
-event_callback("aim_fire", on_aim_fire)
 
 lastmiss2 = 0
 last_hurt_time = 0
