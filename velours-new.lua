@@ -263,7 +263,7 @@ local ui_elements = {
         hitmarker_s_cl = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSecond Color", {0,255,0}),
         hitlogs = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHitlogs"),
         output = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFDisplay", {"On screen", "Console"}),
-        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Anti-brute", "Purchase"}),
+        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Harm", "Anti-brute", "Purchase"}),
         custom_res = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason Miss"),
         custom_reason = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason '?'", {"resolver", "kitty :3", "desync", "lagcomp failure", "spread", "occlusion", "wallshot failure", "unprediction error", "unregistered shot", "Custom"}),
         bullet_tracer = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFBullet Tracer", {255, 255, 255}),
@@ -2566,8 +2566,57 @@ local hitlogs_module = {
             console_log(r, g, b, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
         end
         if not ui_elements.settings.output:get("On screen") then return end
-        notif
-        ication:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
+        notification:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
+    end,
+    player_hurted = function(e)
+        if not ui_elements.main_check.value or not ui_elements.settings.hitlogs.value or not ui_elements.settings.type:get("Harm") then return end
+
+        local victim_userid = e.userid
+        local attacker_userid = e.attacker
+        local remaining_health = e.health
+    
+        local victim_index = client_userid_to_entindex(victim_userid)
+        local attacker_index = client_userid_to_entindex(attacker_userid)
+    
+        local local_player_index = entity_get_local_player()
+    
+        if attacker_index == local_player_index and victim_index ~= local_player_index then
+            return
+        end
+
+        if attacker_userid == 0 or attacker_index == nil then
+            attacker_index = local_player_index
+        end
+    
+        local victim_name = entity_get_player_name(victim_index):lower()
+        local attacker_name = "yourself"
+    
+        if attacker_index ~= local_player_index then
+            attacker_name = entity_get_player_name(attacker_index):lower()
+        end
+
+        local hitgroup_names = {
+            [1] = "Head",
+            [2] = "Chest",
+            [3] = "Stomach",
+            [4] = "Left Arm",
+            [5] = "Right Arm",
+            [6] = "Left Leg",
+            [7] = "Right Leg",
+            [8] = "Generic"
+        }
+
+        local hitgroup = hitgroup_names[e.hitgroup] or "Unknown"
+
+        if hitgroup == "Unknown" then hitgroup = "Generic" end
+    
+        local r, g, b = ui_elements.main.main_color.color:get()
+        local hex = main_funcs.rgba_to_hex(r, g, b)
+        if ui_elements.settings.output:get("Console") then 
+            console_log(r, g, b, ("\a%sHarmed\aFFFFFFFF by \a%s%s\aFFFFFFFF in \a%s%s\aFFFFFFFF (\a%s%i\aFFFFFFFF hp remaining)"):format(hex, hex, attacker_name, hex, hitgroup, hex, remaining_health))
+        end
+        if not ui_elements.settings.output:get("On screen") then return end
+        notification:add(5, ("\a%sHarmed\aFFFFFFFF by \a%s%s\aFFFFFFFF in \a%s%s\aFFFFFFFF (\a%s%i\aFFFFFFFF hp remaining)"):format(hex, hex, attacker_name, hex, hitgroup, hex, remaining_health))
     end,
     aim_miss = function(e)
         if not ui_elements.main_check.value or 
@@ -4486,11 +4535,6 @@ client.set_event_callback("paint_ui", function()
         return 
     end
 
-    local lp = entity.get_local_player()
-    if not lp or not entity.is_alive(lp) then
-        return
-    end
-    
     world_circle({entity.hitbox_position(lp(), 0)}, 10)
 end)
 
@@ -4619,6 +4663,7 @@ ui_elements.settings.hitlogs:set_event('aim_hit', hitlogs_module.aim_hit)
 ui_elements.settings.hitlogs:set_event('aim_miss', hitlogs_module.aim_miss)
 ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurt)
 ui_elements.settings.hitlogs:set_event('item_purchase', hitlogs_module.item_purchase)
+ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurted)
 ui_elements.settings.console_filter:set_callback(main_funcs.console_filter_f)
 ui_elements.settings.enhance_bt:set_callback(main_funcs.backtrack_f)
 client_delay_call(0.1, function() main_funcs.console_filter_f() main_funcs.viewmodel_changer_func() main_funcs.backtrack_f() end)
