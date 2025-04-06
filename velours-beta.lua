@@ -2655,26 +2655,33 @@ local hitlogs_module = {
         local attacker_userid = e.attacker
         local remaining_health = e.health
     
+        -- Получаем индексы игроков по их userid
         local victim_index = client_userid_to_entindex(victim_userid)
         local attacker_index = client_userid_to_entindex(attacker_userid)
     
+        -- Получаем индекс локального игрока
         local local_player_index = entity_get_local_player()
     
-        if attacker_index == local_player_index and victim_index ~= local_player_index then
+        -- Если жертва - это не локальный игрок, игнорируем событие
+        if victim_index ~= local_player_index then
             return
         end
-
+    
+        -- Если атакующий не указан (например, падение или своя граната), считаем, что это локальный игрок
         if attacker_userid == 0 or attacker_index == nil then
             attacker_index = local_player_index
         end
     
-        local victim_name = entity_get_player_name(victim_index):lower()
+        -- Получаем имена игроков
+        local victim_name = "yourself" -- Жертва всегда локальный игрок
         local attacker_name = "yourself"
     
+        -- Если атакующий - это другой игрок, получаем его имя
         if attacker_index ~= local_player_index then
             attacker_name = entity_get_player_name(attacker_index):lower()
         end
-
+    
+        -- Определяем название части тела, куда попали
         local hitgroup_names = {
             [1] = "Head",
             [2] = "Chest",
@@ -2685,10 +2692,12 @@ local hitlogs_module = {
             [7] = "Right Leg",
             [8] = "Generic"
         }
-
+    
         local hitgroup = hitgroup_names[e.hitgroup] or "Unknown"
-
-        if hitgroup == "Unknown" then hitgroup = "Generic" end
+    
+        if hitgroup == "Unknown" then 
+            hitgroup = "Generic" 
+        end
     
         local r, g, b = ui_elements.main.main_color.color:get()
         local hex = main_funcs.rgba_to_hex(r, g, b)
