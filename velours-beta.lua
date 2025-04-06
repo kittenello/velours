@@ -454,6 +454,8 @@ for i=1, #aa_states do
     aa_builder[i]["defensive_pitch_sw"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Min", -89, 89, 0)
     aa_builder[i]["defensive_pitch_sw2"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Max", -89, 89, 0)
     aa_builder[i]["defensive_pitch_value"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\nPitch Value" .. short_names[i], -89, 89, 0)
+    aa_builder[i]["def_pitch_s1"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Flick First", -89, 89, 0, true, "°", 1)
+    aa_builder[i]["def_pitch_s2"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Flick Second", -89, 89, 0, true, "°", 1)
     aa_builder[i]["defensive_yaw_main"] = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFFYaw\a00000000" .. aa_states[i], "Spin", "Switch", "Sideways", "velours", "Flick", "Random")
     aa_builder[i]["defensive_yaw_sw"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Yaw Min", -180, 180, 0)
     aa_builder[i]["defensive_yaw_sw2"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Yaw Max", -180, 180, 0)
@@ -1085,6 +1087,8 @@ for i=1, #aa_states do
     builder.defensive_pitch_sw:depend(builder.defensive_aa, {builder.defensive_pitch, "Switch"})
     builder.defensive_pitch_sw2:depend(builder.defensive_aa, {builder.defensive_pitch, "Switch"})
     builder.defensive_pitch_value:depend(builder.defensive_aa, {builder.defensive_pitch, "Custom"})
+    builder.def_pitch_s1:depend(builder.defensive_aa, {builder.defensive_pitch, "Flick"})
+    builder.def_pitch_s2:depend(builder.defensive_aa, {builder.defensive_pitch, "Flick"})
     builder.defensive_yaw_main:depend(builder.defensive_aa)
     builder.defensive_yaw_sw:depend(builder.defensive_aa, {builder.defensive_yaw_main, "Random", true}, {builder.defensive_yaw_main, "Sideways", true})
     builder.defensive_yaw_sw2:depend(builder.defensive_aa, {builder.defensive_yaw_main, "Random", true}, {builder.defensive_yaw_main, "Sideways", true})
@@ -1307,6 +1311,8 @@ local builder_func = function(e)
             pitch_value = builder_state.defensive_pitch.value == "Semi-Up" and -60 or builder_state.defensive_pitch_value.value
         elseif builder_state.defensive_pitch.value == "Switch" then
         pitch_value = ticks % 8 >= 4 and builder_state.defensive_pitch_sw2.value or builder_state.defensive_pitch_sw.value
+        --elseif builder_state.defensive_pitch.value == "Flick" then
+        --    pitch_value = ticks % 8 == 0 and builder_state.def_pitch_s2.value or builder_state.def_pitch_s1.value
         end
         aa_refs.pitch[2]:override(pitch_value)
 
@@ -4577,7 +4583,7 @@ client.set_event_callback("paint_ui", function()
     local hat_selection = ui_elements.settings.enablechina:get()
 
     if hat_selection == "None" or hat_selection ~= "China" then 
-        return
+        return 
     end
 
     world_circle({entity.hitbox_position(lp(), 0)}, 10)
