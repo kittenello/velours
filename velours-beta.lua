@@ -1743,7 +1743,7 @@ function on_aim_shot(e)
 end
 
 function on_round_start(e)
-    if not ui_elements.settings.killsay:get() or not includes(ui_elements.settings.killsay_add::get(), "Round Start") then return end
+    if not ui_elements.settings.killsay:get() or not includes(ui_elements.settings.killsay_add:get(), "Round Start") then return end
 
     client.exec("say " .. round_words[client.random_int(1, #round_words)])
 end
