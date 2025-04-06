@@ -1652,6 +1652,7 @@ miss_words = {
     "если в тя мисснуло незначит что ты выйграл долбоебище",
     "nn russian kid opyat proletel and cheat ne strelnel, pidorasina",
     "кстати когда в тебя миссают ты хоть понимаешь что тя ебут дилдаком в жопу сразу же?",
+    "miss shot due to qhide"
     }
     
 shot_words = {
