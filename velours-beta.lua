@@ -177,8 +177,9 @@ local ui_elements = {
         buybot_primary = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Primary", get_names(primary_weapons)),
         buybot_pistol = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Secondary", get_names(secondary_weapons)),
         buybot_gear = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Gear", get_names(gear_weapons)),
-        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Exploit Changer\aFFFFFFFF"),
-        nameg = ui_textbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
+        spamenabled = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Changer Exploit\aFFFFFFFF"),
+        nameg = ui_textbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
+        labelexploit = ui_label(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTutorial in t.me/velourscsgo"),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -4362,6 +4363,24 @@ client.set_event_callback("paint_ui", function()
     renderer.indicator(164, 158, 229, 255, ui_elements.settings.custom_indicator:get())
 end)
 
+client.set_event_callback("paint", function()
+    if not ui_elements.main_check.value then return end
+    
+    -- Получаем состояние биндов
+    local left_active = extra_dir == -90  -- Проверяем текущее состояние extra_dir
+    local right_active = extra_dir == 90   -- Проверяем текущее состояние extra_dir
+    
+    -- Получаем цвет акцента из меню
+    local accent_color = {ui_elements.main.main_color.color:get()}
+    
+    -- Рисуем индикаторы в зависимости от активного состояния
+    if left_active then
+        renderer.indicator(accent_color[1], accent_color[2], accent_color[3], 255, "LEFT")
+    elseif right_active then
+        renderer.indicator(accent_color[1], accent_color[2], accent_color[3], 255, "RIGHT")
+    end
+end)
+
 
 -- НИМБ ЕБУЧИЙ
 
@@ -4640,6 +4659,7 @@ elseif original_hitchance then
     original_hitchance = nil
 end
 end)
+
 
 client.set_event_callback("shutdown", onshutdown)
 client.set_event_callback("run_command", hidechat)
