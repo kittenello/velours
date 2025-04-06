@@ -346,7 +346,7 @@ local ui_elements = {
         anim_breaker_selection = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFAnim Breaker Selection", {"Backward legs", "Freeze legs in air", "Pitch 0"}),
         killsay = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk"),
         killsay_type = ui_combobox(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Type", {"None", "Default", "Ad", "Revenge", "Simple 1", "Delayed"}),
-        killsay_add = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss", "Hit"}),
+        killsay_add = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss", "Hit", "Round Start"}),
         clantag = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag"),
         clantag_type = ui_combobox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag Type", {"TG: velourscsgo", "velours e3et", "b1g d1ck..:3", "kitty :3", "cum in me >.<"}),
         console_filter = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Filter"),
@@ -1658,6 +1658,13 @@ shot_words = {
     "1"
 }
 
+round_words = {
+    "боже блять, опять вас тапать лохов",
+    "новый раунд - новая ферма киллов",
+    "найс бездари, новый раунд начался щас опять сольетесь мне пидорасы",
+    "как всегда, все мне слились и опять по новой XDDD"
+}
+
 last_killer = nil
 
 killsay_func = function(e)
@@ -1696,6 +1703,8 @@ killsay_func = function(e)
         return
     elseif add_type == "Hit" then
         return
+    elseif add_type == "Round Start" then
+        return
     elseif selected_type == "Delayed 1" then
         client_delay_call(5, function()
             client_exec("say 1")
@@ -1731,6 +1740,12 @@ function on_aim_shot(e)
     client.delay_call(1, function()
         client.exec("say " .. shot_words[client.random_int(1, #shot_words)])
     end)
+end
+
+function on_round_start(e)
+    if not ui_elements.settings.killsay:get() or not includes(ui_elements.settings.killsay_add::get(), "Round Start") then return end
+
+    client.exec("say " .. round_words[client.random_int(1, #round_words)])
 end
 
 track_last_killer = function(e)
@@ -1796,6 +1811,7 @@ client.set_event_callback("player_death", killsay_func)
 client.set_event_callback("player_death", track_last_killer)
 client.set_event_callback("aim_miss", on_aim_miss)
 client.set_event_callback("aim_hit", on_aim_shot)
+client.set_event_callback("round_start", on_round_start)
 
 local clantags = {
     ["TG: velourscsgo"] = main_funcs.create_clantag("TG: velourscsgo"),
