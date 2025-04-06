@@ -262,7 +262,7 @@ local ui_elements = {
         hitmarker_s_cl = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSecond Color", {0,255,0}),
         hitlogs = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHitlogs"),
         output = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFDisplay", {"On screen", "Console"}),
-        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Harm", "Anti-brute", "Purchase", "Death"}),
+        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Harm", "Anti-brute", "Purchase", "Death", "Evaded"}),
         custom_res = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason Miss"),
         custom_reason = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason '?'", {"resolver", "kitty :3", "desync", "lagcomp failure", "spread", "occlusion", "wallshot failure", "unprediction error", "unregistered shot", "Custom"}),
         bullet_tracer = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFBullet Tracer", {255, 255, 255}),
@@ -4720,6 +4720,75 @@ elseif original_hitchance then
     aa_refs.hitchance:set(original_hitchance)
     original_hitchance = nil
 end
+end)
+
+function GetClosestPoint(A, B, P)
+    a_to_p = { P[1] - A[1], P[2] - A[2] }
+    a_to_b = { B[1] - A[1], B[2] - A[2] }
+
+    atb2 = a_to_b[1]^2 + a_to_b[2]^2
+
+    atp_dot_atb = a_to_p[1]*a_to_b[1] + a_to_p[2]*a_to_b[2]
+    t = atp_dot_atb / atb2
+    
+    return { A[1] + a_to_b[1]*t, A[2] + a_to_b[2]*t }
+end
+
+lastmiss2 = 0
+last_hurt_time = 0
+
+client.set_event_callback("player_hurt", function(cmd)
+    local victim = client.userid_to_entindex(cmd.userid)
+    if victim == entity.get_local_player() then
+        last_hurt_time = globals.curtime()
+    end
+end)
+
+client.set_event_callback("bullet_impact", function(cmd)
+    if not ui_elements.main_check.value or not ui_elements.settings.hitlogs.value or not ui_elements.settings.type:get("Evaded") then return end
+    if not entity.is_alive(entity.get_local_player()) then
+        return
+    end
+
+    local attacker_index = client.userid_to_entindex(cmd.userid)
+    if not attacker_index or attacker_index == 0 then
+        return
+    end
+
+    if entity.is_dormant(attacker_index) or not entity.is_enemy(attacker_index) then
+        return
+    end
+
+    if globals.curtime() - last_hurt_time < 0.5 then
+        return
+    end
+
+    local attacker_origin = { entity.get_prop(attacker_index, "m_vecOrigin") }
+    attacker_origin[3] = attacker_origin[3] + entity.get_prop(attacker_index, "m_vecViewOffset[2]")
+    local local_head = { entity.hitbox_position(entity.get_local_player(), 0) }
+
+    local closest = GetClosestPoint(attacker_origin, { cmd.x, cmd.y, cmd.z }, local_head)
+    local delta = { local_head[1] - closest[1], local_head[2] - closest[2] }
+    local delta_2d = math.sqrt(delta[1]^2 + delta[2]^2)
+
+    if delta_2d > 80 or globals.curtime() - lastmiss2 <= 0.015 then
+        return
+    end
+
+    local attacker_name = entity.get_player_name(attacker_index):lower()
+
+    local r, g, b = ui_elements.main.main_color.color:get()
+    local hex = main_funcs.rgba_to_hex(r, g, b)
+
+    if ui_elements.settings.output:get("Console") then
+        console_log(r, g, b, ("\a%sEvaded\aFFFFFFFF Miss by: \ad8bfd8ff%s\aFFFFFFFF"):format(hex, attacker_name))
+    end
+
+    if ui_elements.settings.output:get("On screen") then
+        notification:add(5, ("\a%sEvaded\aFFFFFFFF Miss by: \ad8bfd8ff%s\aFFFFFFFF"):format(hex, attacker_name))
+    end
+
+    lastmiss2 = globals.curtime()
 end)
 
 
