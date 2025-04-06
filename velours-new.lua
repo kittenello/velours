@@ -12,7 +12,7 @@ local renderer_world_to_screen, renderer_line, globals_tickinterval, renderer_in
 local lp = entity.get_local_player
 local client_console_log = client.log
 local client_console_cmd = client.exec
-local obex_data = obex_fetch and obex_fetch() or {username = 'hello kitty >l#LL#pl[[]] :))', build = 'Beta'}
+local obex_data = obex_fetch and obex_fetch() or {username = 'hello kitty >l#LL#pl[[]] :))', build = 'Stable'}
 local version = "im squirting... > < 2.5 stable"
 local cfg_tbl = {
     {
@@ -179,8 +179,9 @@ local ui_elements = {
         buybot_primary = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Primary", get_names(primary_weapons)),
         buybot_pistol = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Secondary", get_names(secondary_weapons)),
         buybot_gear = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Gear", get_names(gear_weapons)),
-        spamenabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Exploit Changer\aFFFFFFFF"),
-        nameg = ui_textbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
+        spamenabled = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Changer Exploit\aFFFFFFFF"),
+        nameg = ui_textbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
+        labelexploit = ui_label(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTutorial in t.me/velourscsgo"),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -347,7 +348,7 @@ local ui_elements = {
         anim_breaker_selection = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFAnim Breaker Selection", {"Backward legs", "Freeze legs in air", "Pitch 0"}),
         killsay = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk"),
         killsay_type = ui_combobox(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Type", {"None", "Default", "Ad", "Revenge", "Simple 1", "Delayed"}),
-        killsay_add = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss", "Hit"}),
+        killsay_add = ui_multiselect(other_group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFTrashTalk Addiction", {"Miss", "Hit", "Round Start"}),
         clantag = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag"),
         clantag_type = ui_combobox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFClantag Type", {"TG: velourscsgo", "velours e3et", "b1g d1ck..:3", "kitty :3", "cum in me >.<"}),
         console_filter = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFConsole Filter"),
@@ -436,7 +437,9 @@ for i=1, #aa_states do
         yaw_flick_first = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rFrom\n" .. aa_states[i], -180, 180, 0),
         yaw_flick_second = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rTo\n" .. aa_states[i], -180, 180, 0),
         yaw_flick_delay = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rDelay\n" .. aa_states[i], 1, 100),
-        yaw_jitter = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rYaw Jitter", "Off", "Offset", "Center", "Random", "Skitter", "X-Way"),
+        yaw_jitter = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rYaw Jitter", "Off", "Offset", "Center", "Random", "Skitter", "X-Way", "S-Way"),
+        sway_speed = ui_slider(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSpeed\n", 2, 16, 0, true, nil, 1),
+        yawJitterStatic = ui_slider(group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFOffset yaw jitter\r", 0, 90, 0, true, "°", 1),
         yaw_jitter_slider_r = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \r Right Jitter", -180, 180, 0),
         yaw_jitter_slider_l = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \r Left Jitter", -180, 180, 0),
         x_way_slider = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFFWays\n" .. short_names[i], 1, 7, 0, 1),
@@ -453,6 +456,8 @@ for i=1, #aa_states do
     aa_builder[i]["defensive_pitch_sw"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Min", -89, 89, 0)
     aa_builder[i]["defensive_pitch_sw2"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Max", -89, 89, 0)
     aa_builder[i]["defensive_pitch_value"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\nPitch Value" .. short_names[i], -89, 89, 0)
+    aa_builder[i]["def_pitch_s1"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Flick First", -89, 89, 0, true, "°", 1)
+    aa_builder[i]["def_pitch_s2"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Flick Second", -89, 89, 0, true, "°", 1)
     aa_builder[i]["defensive_yaw_main"] = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFFYaw\a00000000" .. aa_states[i], "Spin", "Switch", "Sideways", "velours", "Flick", "Random")
     aa_builder[i]["defensive_yaw_sw"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Yaw Min", -180, 180, 0)
     aa_builder[i]["defensive_yaw_sw2"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Yaw Max", -180, 180, 0)
@@ -826,6 +831,12 @@ local icon = images.load_svg([[
 <svg width="50px" height="50px" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25 39.7l-.6-.5C11.5 28.7 8 25 8 19c0-5 4-9 9-9 4.1 0 6.4 2.3 8 4.1 1.6-1.8 3.9-4.1 8-4.1 5 0 9 4 9 9 0 6-3.5 9.7-16.4 20.2l-.6.5zM17 12c-3.9 0-7 3.1-7 7 0 5.1 3.2 8.5 15 18.1 11.8-9.6 15-13 15-18.1 0-3.9-3.1-7-7-7-3.5 0-5.4 2.1-6.9 3.8L25 17.1l-1.1-1.3C22.4 14.1 20.5 12 17 12z"/></svg>
 ]])
 
+function get_sway_value(speed, min_value, max_value)
+    local midpoint = (min_value + max_value) / 2
+    local amplitude = (max_value - min_value) / 2
+    return midpoint + math.sin(globals_curtime() * speed) * amplitude
+end
+
 local notification = (function(self)
     local notification = {}
     local notif = {callback_created = false, max_count = 5}
@@ -1066,14 +1077,20 @@ for i=1, #aa_states do
     builder.yaw_left:depend({builder.yaw_offset, function() return builder.yaw_offset.value == "L/R" or builder.yaw_offset.value == "Jitter" end})
     builder.yaw_right:depend({builder.yaw_offset, function() return builder.yaw_offset.value == "L/R" or builder.yaw_offset.value == "Jitter" end})
     builder.x_way_slider:depend({builder.yaw_jitter, "X-Way"})
+    builder.sway_speed:depend({builder.yaw_jitter, "S-Way"})
+    builder.yawJitterStatic:depend({builder.yaw_jitter, "S-Way"})
     builder.yaw_jitter_slider_r:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "X-Way" and builder.yaw_jitter.value ~= "Off" end})
     builder.yaw_jitter_slider_l:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "X-Way" and builder.yaw_jitter.value ~= "Off" end})
+    builder.yaw_jitter_slider_r:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "S-Way" and builder.yaw_jitter.value ~= "Off" end})
+    builder.yaw_jitter_slider_l:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "S-Way" and builder.yaw_jitter.value ~= "Off" end})
     builder.bodyyaw_add:depend({builder.body_yaw, "Off", true}, {builder.yaw_offset, function() return builder.yaw_offset.value ~= "Delayed" and builder.yaw_offset.value ~= "Jitter" end})
 
     builder.defensive_pitch:depend(builder.defensive_aa)
     builder.defensive_pitch_sw:depend(builder.defensive_aa, {builder.defensive_pitch, "Switch"})
     builder.defensive_pitch_sw2:depend(builder.defensive_aa, {builder.defensive_pitch, "Switch"})
     builder.defensive_pitch_value:depend(builder.defensive_aa, {builder.defensive_pitch, "Custom"})
+    builder.def_pitch_s1:depend(builder.defensive_aa, {builder.defensive_pitch, "Flick"})
+    builder.def_pitch_s2:depend(builder.defensive_aa, {builder.defensive_pitch, "Flick"})
     builder.defensive_yaw_main:depend(builder.defensive_aa)
     builder.defensive_yaw_sw:depend(builder.defensive_aa, {builder.defensive_yaw_main, "Random", true}, {builder.defensive_yaw_main, "Sideways", true})
     builder.defensive_yaw_sw2:depend(builder.defensive_aa, {builder.defensive_yaw_main, "Random", true}, {builder.defensive_yaw_main, "Sideways", true})
@@ -1228,6 +1245,22 @@ local builder_func = function(e)
         current_stage = current_stage + 1
         if current_stage > max_value then current_stage = 1 end
     end
+    if builder_state.yaw_jitter.value == "S-Way" then
+        local speed = builder_state.sway_speed.value / 2
+        local min_value = 0
+        local max_value = builder_state.yawJitterStatic.value
+    
+        aa_refs.yaw_jitter[1]:override("Center")
+        aa_refs.yaw_jitter[2]:override(get_sway_value(speed, min_value, max_value))
+        aa_refs.body_yaw[1]:override("Off")
+        
+        -- Добавляем рандомизацию если нужно
+        if builder_state.randomization and builder_state.randomization.value > 0 then
+            local random_offset = math.random(0, builder_state.randomization.value)
+            aa_refs.yaw_jitter[2]:override(aa_refs.yaw_jitter[2]:get() + random_offset)
+        end
+        return
+    end
 
     local offset, jitter_offset = tbl_data.yaw_offset, tbl_data.jitter_offset
     local yaw_val
@@ -1280,6 +1313,8 @@ local builder_func = function(e)
             pitch_value = builder_state.defensive_pitch.value == "Semi-Up" and -60 or builder_state.defensive_pitch_value.value
         elseif builder_state.defensive_pitch.value == "Switch" then
         pitch_value = ticks % 8 >= 4 and builder_state.defensive_pitch_sw2.value or builder_state.defensive_pitch_sw.value
+        --elseif builder_state.defensive_pitch.value == "Flick" then
+        --    pitch_value = ticks % 8 == 0 and builder_state.def_pitch_s2.value or builder_state.def_pitch_s1.value
         end
         aa_refs.pitch[2]:override(pitch_value)
 
@@ -1619,10 +1654,18 @@ miss_words = {
     "если в тя мисснуло незначит что ты выйграл долбоебище",
     "nn russian kid opyat proletel and cheat ne strelnel, pidorasina",
     "кстати когда в тебя миссают ты хоть понимаешь что тя ебут дилдаком в жопу сразу же?",
+    "miss shot due to qhide"
     }
     
 shot_words = {
     "1"
+}
+
+round_words = {
+    "боже блять, опять вас тапать лохов",
+    "новый раунд - новая ферма киллов",
+    "найс бездари, новый раунд начался щас опять сольетесь мне пидорасы",
+    "как всегда, все мне слились и опять по новой XDDD"
 }
 
 last_killer = nil
@@ -1663,6 +1706,8 @@ killsay_func = function(e)
         return
     elseif add_type == "Hit" then
         return
+    elseif add_type == "Round Start" then
+        return
     elseif selected_type == "Delayed 1" then
         client_delay_call(5, function()
             client_exec("say 1")
@@ -1698,6 +1743,12 @@ function on_aim_shot(e)
     client.delay_call(1, function()
         client.exec("say " .. shot_words[client.random_int(1, #shot_words)])
     end)
+end
+
+function on_round_start(e)
+    if not ui_elements.settings.killsay:get() or not includes(ui_elements.settings.killsay_add:get(), "Round Start") then return end
+
+    client.exec("say " .. round_words[client.random_int(1, #round_words)])
 end
 
 track_last_killer = function(e)
@@ -1763,6 +1814,7 @@ client.set_event_callback("player_death", killsay_func)
 client.set_event_callback("player_death", track_last_killer)
 client.set_event_callback("aim_miss", on_aim_miss)
 client.set_event_callback("aim_hit", on_aim_shot)
+client.set_event_callback("round_start", on_round_start)
 
 local clantags = {
     ["TG: velourscsgo"] = main_funcs.create_clantag("TG: velourscsgo"),
@@ -4336,6 +4388,24 @@ client.set_event_callback("paint_ui", function()
     renderer.indicator(164, 158, 229, 255, ui_elements.settings.custom_indicator:get())
 end)
 
+client.set_event_callback("paint", function()
+    if not ui_elements.main_check.value then return end
+    
+    -- Получаем состояние биндов
+    local left_active = extra_dir == -90  -- Проверяем текущее состояние extra_dir
+    local right_active = extra_dir == 90   -- Проверяем текущее состояние extra_dir
+    
+    -- Получаем цвет акцента из меню
+    local accent_color = {ui_elements.main.main_color.color:get()}
+    
+    -- Рисуем индикаторы в зависимости от активного состояния
+    if left_active then
+        renderer.indicator(accent_color[1], accent_color[2], accent_color[3], 255, "LEFT")
+    elseif right_active then
+        renderer.indicator(accent_color[1], accent_color[2], accent_color[3], 255, "RIGHT")
+    end
+end)
+
 
 -- НИМБ ЕБУЧИЙ
 
@@ -4614,6 +4684,7 @@ elseif original_hitchance then
     original_hitchance = nil
 end
 end)
+
 
 client.set_event_callback("shutdown", onshutdown)
 client.set_event_callback("run_command", hidechat)
