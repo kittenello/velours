@@ -466,28 +466,6 @@ for i=1, #aa_states do
     aa_builder[i]["defensive_yaw_delay"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Defensive Delay", -6, 10, 0, true, "t", 1, delay_tbl)
     aa_builder[i]["defensive_adaptive_def_delay"] = ui_checkbox(group, "\aF88BFFFF>.< ~ \aFFFFFFFFAdaptive Defensive Delay\n" .. short_names[i])
     aa_builder[i]["label_other_sp_sp"] = ui_label(main_group, "\n\n")
-    aa_builder[i]["aa_import_btn"] = ui_button(main_group, "\aF88BFFFF>.< ~ \aFFFFFFFFImport", function() 
-        local s, err = pcall(function()  
-            local raw = base64.decode(clipboard.get())
-            local raw_clean = raw:gsub("null,", ""):gsub("%[%[", "[null,["):gsub("%[%{", "[" .. ("null,"):rep(i-1) .. "{")
-            local json_data = json.parse(raw_clean)
-            config:load(json_data, 2, i)
-        end)
-            if s then
-                print("AA Imported!")
-            else
-                print("Invalid Config! [" .. err .. "]")
-            end
-    end)
-    aa_builder[i]["aa_export_btn"] = ui_button(main_group, "\aF88BFFFF>.< ~ \aFFFFFFFFExport", function() 
-            local config_data = config:save(2, i)
-            local s = pcall(function() clipboard.set(base64.encode(json.stringify(config_data))) end)
-            if s then
-            print("AA state Exported! [" .. aa_states[i] .. "]")
-            else
-            print("Failed to export [" .. aa_states[i] .. "] state")
-            end
-    end)
 end
 
 config = ui.setup({ui_elements, aa_builder})
