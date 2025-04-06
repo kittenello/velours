@@ -434,7 +434,9 @@ for i=1, #aa_states do
         yaw_flick_first = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rFrom\n" .. aa_states[i], -180, 180, 0),
         yaw_flick_second = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rTo\n" .. aa_states[i], -180, 180, 0),
         yaw_flick_delay = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rDelay\n" .. aa_states[i], 1, 100),
-        yaw_jitter = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rYaw Jitter", "Off", "Offset", "Center", "Random", "Skitter", "X-Way"),
+        yaw_jitter = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \rYaw Jitter", "Off", "Offset", "Center", "Random", "Skitter", "X-Way", "S-Way"),
+        sway_speed = ui_slider(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSpeed\n", 2, 16, 0, true, nil, 1),
+        yawJitterStatic = ui_slider(group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFOffset yaw jitter\r", 0, 90, 0, true, "°", 1),
         yaw_jitter_slider_r = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \r Right Jitter", -180, 180, 0),
         yaw_jitter_slider_l = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF\v" .. short_names[i] .. ": \r Left Jitter", -180, 180, 0),
         x_way_slider = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFFWays\n" .. short_names[i], 1, 7, 0, 1),
@@ -824,6 +826,12 @@ local icon = images.load_svg([[
 <svg width="50px" height="50px" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25 39.7l-.6-.5C11.5 28.7 8 25 8 19c0-5 4-9 9-9 4.1 0 6.4 2.3 8 4.1 1.6-1.8 3.9-4.1 8-4.1 5 0 9 4 9 9 0 6-3.5 9.7-16.4 20.2l-.6.5zM17 12c-3.9 0-7 3.1-7 7 0 5.1 3.2 8.5 15 18.1 11.8-9.6 15-13 15-18.1 0-3.9-3.1-7-7-7-3.5 0-5.4 2.1-6.9 3.8L25 17.1l-1.1-1.3C22.4 14.1 20.5 12 17 12z"/></svg>
 ]])
 
+function get_sway_value(speed, min_value, max_value)
+    local midpoint = (min_value + max_value) / 2
+    local amplitude = (max_value - min_value) / 2
+    return midpoint + math.sin(globals_curtime() * speed) * amplitude
+end
+
 local notification = (function(self)
     local notification = {}
     local notif = {callback_created = false, max_count = 5}
@@ -1064,8 +1072,12 @@ for i=1, #aa_states do
     builder.yaw_left:depend({builder.yaw_offset, function() return builder.yaw_offset.value == "L/R" or builder.yaw_offset.value == "Jitter" end})
     builder.yaw_right:depend({builder.yaw_offset, function() return builder.yaw_offset.value == "L/R" or builder.yaw_offset.value == "Jitter" end})
     builder.x_way_slider:depend({builder.yaw_jitter, "X-Way"})
+    builder.sway_speed:depend({builder.yaw_jitter, "S-Way"})
+    builder.yawJitterStatic:depend({builder.yaw_jitter, "S-Way"})
     builder.yaw_jitter_slider_r:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "X-Way" and builder.yaw_jitter.value ~= "Off" end})
     builder.yaw_jitter_slider_l:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "X-Way" and builder.yaw_jitter.value ~= "Off" end})
+    builder.yaw_jitter_slider_r:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "S-Way" and builder.yaw_jitter.value ~= "Off" end})
+    builder.yaw_jitter_slider_l:depend({builder.yaw_jitter, function() return builder.yaw_jitter.value ~= "S-Way" and builder.yaw_jitter.value ~= "Off" end})
     builder.bodyyaw_add:depend({builder.body_yaw, "Off", true}, {builder.yaw_offset, function() return builder.yaw_offset.value ~= "Delayed" and builder.yaw_offset.value ~= "Jitter" end})
 
     builder.defensive_pitch:depend(builder.defensive_aa)
@@ -1225,6 +1237,22 @@ local builder_func = function(e)
         if max_value <= 1 then return end
         current_stage = current_stage + 1
         if current_stage > max_value then current_stage = 1 end
+    end
+    if builder_state.yaw_jitter.value == "S-Way" then
+        local speed = builder_state.sway_speed.value / 2
+        local min_value = 0
+        local max_value = builder_state.yawJitterStatic.value
+    
+        aa_refs.yaw_jitter[1]:override("Center")
+        aa_refs.yaw_jitter[2]:override(get_sway_value(speed, min_value, max_value))
+        aa_refs.body_yaw[1]:override("Off")
+        
+        -- Добавляем рандомизацию если нужно
+        if builder_state.randomization and builder_state.randomization.value > 0 then
+            local random_offset = math.random(0, builder_state.randomization.value)
+            aa_refs.yaw_jitter[2]:override(aa_refs.yaw_jitter[2]:get() + random_offset)
+        end
+        return
     end
 
     local offset, jitter_offset = tbl_data.yaw_offset, tbl_data.jitter_offset
