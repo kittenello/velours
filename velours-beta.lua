@@ -262,7 +262,7 @@ local ui_elements = {
         hitmarker_s_cl = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSecond Color", {0,255,0}),
         hitlogs = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFHitlogs"),
         output = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFDisplay", {"On screen", "Console"}),
-        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Harm", "Anti-brute", "Purchase"}),
+        type = ui_multiselect(group, "\aF88BFFFF:3 ~ \aFFFFFFFFType", {"Hit", "Miss", "Nade", "Fire", "Harm", "Anti-brute", "Purchase", "Death"}),
         custom_res = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason Miss"),
         custom_reason = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Reason '?'", {"resolver", "kitty :3", "desync", "lagcomp failure", "spread", "occlusion", "wallshot failure", "unprediction error", "unregistered shot", "Custom"}),
         bullet_tracer = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFBullet Tracer", {255, 255, 255}),
@@ -466,6 +466,28 @@ for i=1, #aa_states do
     aa_builder[i]["defensive_yaw_delay"] = ui_slider(group, "\aF88BFFFF>.< ~ \aFFFFFFFF[" .. short_names[i] .. "] Defensive Delay", -6, 10, 0, true, "t", 1, delay_tbl)
     aa_builder[i]["defensive_adaptive_def_delay"] = ui_checkbox(group, "\aF88BFFFF>.< ~ \aFFFFFFFFAdaptive Defensive Delay\n" .. short_names[i])
     aa_builder[i]["label_other_sp_sp"] = ui_label(main_group, "\n\n")
+    aa_builder[i]["aa_import_btn"] = ui_button(main_group, "\aF88BFFFF>.< ~ \aFFFFFFFFImport", function() 
+        local s, err = pcall(function()  
+            local raw = base64.decode(clipboard.get())
+            local raw_clean = raw:gsub("null,", ""):gsub("%[%[", "[null,["):gsub("%[%{", "[" .. ("null,"):rep(i-1) .. "{")
+            local json_data = json.parse(raw_clean)
+            config:load(json_data, 2, i)
+        end)
+            if s then
+                print("AA Imported!")
+            else
+                print("Invalid Config! [" .. err .. "]")
+            end
+    end)
+    aa_builder[i]["aa_export_btn"] = ui_button(main_group, "\aF88BFFFF>.< ~ \aFFFFFFFFExport", function() 
+            local config_data = config:save(2, i)
+            local s = pcall(function() clipboard.set(base64.encode(json.stringify(config_data))) end)
+            if s then
+            print("AA state Exported! [" .. aa_states[i] .. "]")
+            else
+            print("Failed to export [" .. aa_states[i] .. "] state")
+            end
+    end)
 end
 
 config = ui.setup({ui_elements, aa_builder})
@@ -2596,6 +2618,36 @@ local hitlogs_module = {
         if not ui_elements.settings.output:get("On screen") then return end
         notification:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
     end,
+    player_death = function(e)
+        -- Проверяем, включен ли функционал в настройках
+        if not ui_elements.main_check.value or not ui_elements.settings.hitlogs.value or not ui_elements.settings.type:get("Death") then 
+            return 
+        end
+    
+        local weapon = e.weapon or "Unknown"
+        local victim_userid = e.userid
+        local attacker_userid = e.attacker
+    
+        local victim_index = client_userid_to_entindex(victim_userid)
+        local attacker_index = client_userid_to_entindex(attacker_userid)
+    
+        local victim_name = entity_get_player_name(victim_index):lower()
+        local attacker_name = "you"
+    
+        if attacker_index ~= entity_get_local_player() then
+            attacker_name = entity_get_player_name(attacker_index):lower()
+        end
+
+        if weapon == "inferno" then weapon = "Molotov" end    
+        local r, g, b = ui_elements.main.main_color.color:get()
+        local hex = main_funcs.rgba_to_hex(r, g, b)
+    
+        if ui_elements.settings.output:get("Console") then 
+            console_log(r, g, b, ("\a%s%s\aFFFFFFFF was killed by \a%s%s\aFFFFFFFF with \a%s%s\aFFFFFFFF"):format(hex, victim_name, hex, attacker_name, hex, weapon))
+        end
+        if not ui_elements.settings.output:get("On screen") then return end
+        notification:add(5, ("\a%s%s\aFFFFFFFF was killed by \a%s%s\aFFFFFFFF with \a%s%s\aFFFFFFFF"):format(hex, victim_name, hex, attacker_name, hex, weapon))
+    end,
     player_hurted = function(e)
         if not ui_elements.main_check.value or not ui_elements.settings.hitlogs.value or not ui_elements.settings.type:get("Harm") then return end
 
@@ -4710,6 +4762,7 @@ ui_elements.settings.hitlogs:set_event('aim_hit', hitlogs_module.aim_hit)
 ui_elements.settings.hitlogs:set_event('aim_miss', hitlogs_module.aim_miss)
 ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurt)
 ui_elements.settings.hitlogs:set_event('item_purchase', hitlogs_module.item_purchase)
+ui_elements.settings.hitlogs:set_event('player_death', hitlogs_module.player_death)
 ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurted)
 ui_elements.settings.console_filter:set_callback(main_funcs.console_filter_f)
 ui_elements.settings.enhance_bt:set_callback(main_funcs.backtrack_f)
