@@ -13,7 +13,7 @@ local lp = entity.get_local_player
 local client_console_log = client.log
 local client_console_cmd = client.exec
 local obex_data = obex_fetch and obex_fetch() or {username = 'hello kitty >l#LL#pl[[]] :))', build = 'Beta'}
-local version = "im squirting... > < 2.5 stable"
+local version = "2.5 stable"
 local cfg_tbl = {
     {
         name = "Owner Preset",
@@ -138,7 +138,7 @@ textures = {
 
 local ui_elements = {
     main_check = ui_checkbox(group, "\bF7A6FD\b685F95[velours.lua]"),
-    tab = ui_combobox(main_group, "\n", {"Configs", "Anti-Aim", "Settings", "RageBot", "BuyBot"}),
+    tab = ui_combobox(main_group, "\n", {"Configs", "Anti-Aim", "Settings", "RageBot", "Other"}),
     info = {
         label_sp = ui_label(main_group, "\n\n\n"),
         label_tab2 = ui_label(main_group, "\v•\r Information"),
@@ -180,6 +180,7 @@ local ui_elements = {
         spamenabled = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Changer Exploit\aFFFFFFFF"),
         nameg = ui_textbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
         labelexploit = ui_label(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTutorial in t.me/velourscsgo"),
+        svaston = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFSvaston"),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -254,6 +255,7 @@ local ui_elements = {
         watermark = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFWatermark"),
         start_col = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFStart Color", {138, 120, 197}),
         end_col = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFEnd Color", {55, 52, 67}),
+        watermark_style = ui_combobox(group, "\aF88BFFFF>.< ~ \aFFFFFFFFWatermark Style", {"Old", "Modern"}),
         indicators = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFIndicators"),
         indic_type = ui_combobox(group, "\n\aF88BFFFF:3 ~ \aFFFFFFFFIndicators type", {"Classic", "Alt"}),
         indic_switch_color = ui_label(group, "\aF88BFFFF:3 ~ \aFFFFFFFFSwitch Color", {255, 151, 151}),
@@ -396,7 +398,7 @@ local tab_names = {
     anti_aims = "Anti-Aim",
     settings = "Settings",
     ragebotik = "RageBot",
-    buybotik = "BuyBot",
+    buybotik = "Other",
     info = "Configs"
 }
 local tab_names_aa = {
@@ -1919,15 +1921,6 @@ local defensive_indicator = function()
         renderer_rectangle(x+offset_x+1, y+offset_y+15, 93, 3, 16, 16, 16, 180)
         renderer_rectangle(x+offset_x+1, y+offset_y+15, (length*6)-3, 3, r, g, b, a)
     end
-end
-
-
-
-local watermark_func = function()
-    if not ui_elements.main_check.value or not ui_elements.settings.watermark.value then return end
-    local start, en = ui_elements.settings.start_col.color.value, ui_elements.settings.end_col.color.value
-    local text = main_funcs:text_animation(5, start, en, "VELOURS :3 ~.:3./s")
-    renderer_text(w/2, h-25, 255, 255, 255, 255, 'c', 0, text .. (obex_data.build == "cummed.." and "  \aE25252FF[" .. obex_data.build:upper() .. "]" or ""))
 end
 
 local hitmarker = {
@@ -4791,6 +4784,146 @@ client.set_event_callback("bullet_impact", function(cmd)
     lastmiss2 = globals.curtime()
 end)
 
+watermark_bg = renderer.load_svg([[
+<svg width="250" height="28" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#F88BFF;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#9B59B6;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="250" height="28" rx="5" ry="5" fill="url(#grad)" filter="url(#shadow)" />
+</svg>
+]], 250, 28)
+function handle_watermark()
+    if not ui_elements.main_check.value then return end
+    
+    local watermark_style = ui_elements.settings.watermark_style:get()
+    
+    if watermark_style == "Old" then
+        watermark_func()
+    else
+        render_modern_watermark()
+    end
+end
+function render_modern_watermark()
+    if not ui_elements.main_check.value or not ui_elements.settings.watermark.value then return end
+    
+    local fps = math.floor(1 / globals.frametime())
+    local current_config = "-"
+    local selected_idx = ui_elements.main.cfg_list:get()
+    if selected_idx > 0 and selected_idx <= #cfg_tbl then
+        current_config = cfg_tbl[selected_idx].name
+    end
+    
+    local screen_w, screen_h = client.screen_size()
+    local x, y = 10, 10
+    
+    -- Определяем цвета
+    local purple_color = {156, 79, 176, 255} -- Фиолетовый цвет как на скриншоте
+    local glow_color = {156, 79, 176, 50} -- Цвет свечения (более прозрачный)
+    
+    -- Собираем текст ватермарки
+    local watermark_text = "Velours-beta.lua  FPS: " .. fps .. "  |  v" .. version .. "  |  " .. entity.get_player_name(entity.get_local_player())
+    if current_config ~= "-" then
+        watermark_text = watermark_text .. "  |  " .. current_config
+    end
+    
+    -- Измеряем размер текста
+    local text_width, text_height = renderer.measure_text("", watermark_text)
+    
+    -- Добавляем отступы
+    local padding_x, padding_y = 8, 4
+    local box_width = text_width + padding_x * 2
+    local box_height = text_height + padding_y * 2
+    
+    -- Определяем позицию (в правом верхнем углу)
+    x = screen_w - box_width - 10
+    
+    -- Рисуем свечение (несколько прямоугольников с уменьшающейся прозрачностью)
+    for i = 3, 1, -1 do
+        renderer.rectangle(x - i, y - i, box_width + i * 2, box_height + i * 2, glow_color[1], glow_color[2], glow_color[3], glow_color[4] / i)
+    end
+    
+    -- Рисуем обводку прямоугольника
+    renderer.rectangle(x - 1, y - 1, box_width + 2, box_height + 2, purple_color[1], purple_color[2], purple_color[3], purple_color[4])
+    
+    -- Рисуем текст
+    renderer.text(x + padding_x, y + padding_y, 255, 255, 255, 255, "", 0, watermark_text)
+end
+watermark_func = function()
+    if not ui_elements.main_check.value or not ui_elements.settings.watermark.value then return end
+    local start, en = ui_elements.settings.start_col.color.value, ui_elements.settings.end_col.color.value
+    local text = main_funcs:text_animation(5, start, en, "VELOURS :3 ~.:3./s")
+    renderer_text(w/2, h-25, 255, 255, 255, 255, 'c', 0, text .. (obex_data.build == "cummed.." and "  \aE25252FF[" .. obex_data.build:upper() .. "]" or ""))
+end
+client.set_event_callback("paint", function()
+    handle_watermark()
+end)
+
+math_ceil, math_tan, math_correctRadians, math_fact, math_log10, math_randomseed, math_cos, math_sinh, math_random, math_huge, math_pi, math_max, math_atan2, math_ldexp, math_floor, math_sqrt, math_deg, math_atan = math.ceil, math.tan, math.correctRadians, math.fact, math.log10, math.randomseed, math.cos, math.sinh, math.random, math.huge, math.pi, math.max, math.atan2, math.ldexp, math.floor, math.sqrt, math.deg, math.atan 
+math_fmod, math_acos, math_pow, math_abs, math_min, math_sin, math_frexp, math_log, math_tanh, math_exp, math_modf, math_cosh, math_asin, math_rad = math.fmod, math.acos, math.pow, math.abs, math.min, math.sin, math.frexp, math.log, math.tanh, math.exp, math.modf, math.cosh, math.asin, math.rad 
+
+function DEG2RAD(x) return x * math_pi / 180 end
+function RAD2DEG(x) return x * 180 / math_pi end
+
+function hsv2rgb(h, s, v, a)
+    local r, g, b
+  
+    local i = math_floor(h * 6);
+    local f = h * 6 - i;
+    local p = v * (1 - s);
+    local q = v * (1 - f * s);
+    local t = v * (1 - (1 - f) * s);
+  
+    i = i % 6
+  
+    if i == 0 then r, g, b = v, t, p
+    elseif i == 1 then r, g, b = q, v, p
+    elseif i == 2 then r, g, b = p, v, t
+    elseif i == 3 then r, g, b = p, q, v
+    elseif i == 4 then r, g, b = t, p, v
+    elseif i == 5 then r, g, b = v, p, q
+    end
+  
+    return r * 255, g * 255, b * 255, a * 255
+end
+
+rainbow = 0.00
+rotationdegree = 0.000;
+
+function draw_svaston(x, y, size)
+    local frametime = globals.frametime()
+    local a = size / 60
+    local gamma = math_atan(a / a)
+    rainbow = rainbow + (frametime * 0.5)
+    if rainbow > 1.0 then rainbow = 0.0 end
+    if rotationdegree > 89 then rotationdegree = 0 end
+
+    for i = 0, 4 do  
+        local p_0 = (a * math_sin(DEG2RAD(rotationdegree + (i * 90))))
+        local p_1 = (a * math_cos(DEG2RAD(rotationdegree + (i * 90))))
+        local p_2 =((a / math_cos(gamma)) * math_sin(DEG2RAD(rotationdegree + (i * 90) + RAD2DEG(gamma))))
+        local p_3 =((a / math_cos(gamma)) * math_cos(DEG2RAD(rotationdegree + (i * 90) + RAD2DEG(gamma))))
+
+        local a, r, g, b = hsv2rgb(rainbow, 1, 1, 1)
+        renderer.line(x, y, x + p_0, y - p_1, a, r, g, b)
+        renderer.line(x + p_0, y - p_1, x + p_2, y - p_3, a, r, g, b)
+    end
+    rotationdegree = rotationdegree + (frametime * 150)
+end
+
+function on_paint()
+    if not ui_elements.buybotik.svaston:get() then return end
+    local screenW, screenH = client.screen_size()
+    draw_svaston(screenW / 2, screenH / 2, screenH /2) 
+end
+
+client.set_event_callback('paint', on_paint)
+
 
 client.set_event_callback("shutdown", onshutdown)
 client.set_event_callback("run_command", hidechat)
@@ -4845,7 +4978,7 @@ ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurt
 ui_elements.settings.console_filter:set_callback(main_funcs.console_filter_f)
 ui_elements.settings.enhance_bt:set_callback(main_funcs.backtrack_f)
 client_delay_call(0.1, function() main_funcs.console_filter_f() main_funcs.viewmodel_changer_func() main_funcs.backtrack_f() end)
---1
+
 ui_elements.settings.viewmodel_check:set_callback(main_funcs.viewmodel_changer_func)
 ui_elements.settings.viewmodel_x:set_callback(main_funcs.viewmodel_changer_func)
 ui_elements.settings.viewmodel_y:set_callback(main_funcs.viewmodel_changer_func)
