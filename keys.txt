@@ -1,3 +1,2 @@
 0LzQuNGB0YLQtdGAINC/0L7QvdGH0LjQug==
-testkey
-08-05
+testkey 08.05
