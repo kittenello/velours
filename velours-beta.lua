@@ -181,6 +181,8 @@ local ui_elements = {
         nameg = ui_textbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
         labelexploit = ui_label(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTutorial in t.me/velourscsgo"),
         svaston = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFSvaston"),
+        enabled_reference = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaser Range"),
+        position_reference = ui_combobox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaser Range Position", {"At feet", "At middle"}),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -1254,7 +1256,6 @@ local builder_func = function(e)
         aa_refs.yaw_jitter[2]:override(get_sway_value(speed, min_value, max_value))
         aa_refs.body_yaw[1]:override("Off")
         
-        -- Добавляем рандомизацию если нужно
         if builder_state.randomization and builder_state.randomization.value > 0 then
             local random_offset = math.random(0, builder_state.randomization.value)
             aa_refs.yaw_jitter[2]:override(aa_refs.yaw_jitter[2]:get() + random_offset)
@@ -1862,7 +1863,7 @@ local arrows_func = function()
     local manual_aa2 = extra_dir == -90
     local r, g, b, a = ui_elements.settings.arrows.color:get()
 
-    -- Создаем таблицы для координат
+
     local A1 = { x = center[1] + 52, y = center[2] }
     local B1 = { x = center[1] + 42, y = center[2] - 5 }
     local C1 = { x = center[1] + 42, y = center[2] + 7 }
@@ -1871,7 +1872,6 @@ local arrows_func = function()
     local B2 = { x = center[1] - 42, y = center[2] - 5 }
     local C2 = { x = center[1] - 42, y = center[2] + 7 }
 
-    -- Вызываем renderer_triangle с таблицами
     renderer_triangle(A1, B1, C1, manual_aa1 and r or 45, manual_aa1 and g or 45, manual_aa1 and b or 45, manual_aa1 and a or 150)
     renderer_triangle(A2, B2, C2, manual_aa2 and r or 45, manual_aa2 and g or 45, manual_aa2 and b or 45, manual_aa2 and a or 150)
 end
@@ -2177,7 +2177,7 @@ local console_log = function(r, g, b, text)
 end
 
 local last_shot_t = globals_curtime()
-local function reset_anti_brute()
+function reset_anti_brute()
     if ui_elements.settings.hitlogs.value and ui_elements.settings.output:get("On screen") and ui_elements.settings.type:get("Anti-brute") then notification:add(5, "Switched anti-bruteforce due to reset") end
     tbl_data = {side = false, yaw_offset = 0, jitter_offset = 0, f_called = false}
     last_shot_t = globals_curtime()
@@ -2612,7 +2612,6 @@ local hitlogs_module = {
         notification:add(5, ("\a%s%s\aFFFFFFFF purchased \a%s%s\aFFFFFFFF (%s)"):format(hex, player_name, hex, weapon, team_name))
     end,
     player_death = function(e)
-        -- Проверяем, включен ли функционал в настройках
         if not ui_elements.main_check.value or not ui_elements.settings.hitlogs.value or not ui_elements.settings.type:get("Death") then 
             return 
         end
@@ -2648,33 +2647,26 @@ local hitlogs_module = {
         local attacker_userid = e.attacker
         local remaining_health = e.health
     
-        -- Получаем индексы игроков по их userid
         local victim_index = client_userid_to_entindex(victim_userid)
         local attacker_index = client_userid_to_entindex(attacker_userid)
     
-        -- Получаем индекс локального игрока
         local local_player_index = entity_get_local_player()
     
-        -- Если жертва - это не локальный игрок, игнорируем событие
         if victim_index ~= local_player_index then
             return
         end
     
-        -- Если атакующий не указан (например, падение или своя граната), считаем, что это локальный игрок
         if attacker_userid == 0 or attacker_index == nil then
             attacker_index = local_player_index
         end
     
-        -- Получаем имена игроков
-        local victim_name = "yourself" -- Жертва всегда локальный игрок
+        local victim_name = "yourself"
         local attacker_name = "yourself"
     
-        -- Если атакующий - это другой игрок, получаем его имя
         if attacker_index ~= local_player_index then
             attacker_name = entity_get_player_name(attacker_index):lower()
         end
     
-        -- Определяем название части тела, куда попали
         local hitgroup_names = {
             [1] = "Head",
             [2] = "Chest",
@@ -3205,7 +3197,7 @@ ui_elements.settings.tpdistanceslider:set_callback(function()
     client_exec("cam_idealdist " .. tostring(ui_elements.settings.tpdistanceslider:get()))
 end)
 
-local original_angles = nil
+original_angles = nil
 
 local function on_paint(c)
     if ui_elements.settings.auto_smoke:get() and ui_elements.settings.auto_smoke_bind:get() then
@@ -4421,14 +4413,11 @@ end)
 client.set_event_callback("paint", function()
     if not ui_elements.main_check.value then return end
     
-    -- Получаем состояние биндов
-    local left_active = extra_dir == -90  -- Проверяем текущее состояние extra_dir
-    local right_active = extra_dir == 90   -- Проверяем текущее состояние extra_dir
+    local left_active = extra_dir == -90 
+    local right_active = extra_dir == 90
     
-    -- Получаем цвет акцента из меню
     local accent_color = {ui_elements.main.main_color.color:get()}
     
-    -- Рисуем индикаторы в зависимости от активного состояния
     if left_active then
         renderer.indicator(accent_color[1], accent_color[2], accent_color[3], 255, "LEFT")
     elseif right_active then
@@ -4635,6 +4624,10 @@ client.set_event_callback("paint_ui", function()
         return 
     end
 
+    if not (not thirdperson_china[1]:get() or not thirdperson_china[2]:get()) or lp() == nil or entity.is_alive(lp()) == false then
+        return
+    end
+
     world_circle({entity.hitbox_position(lp(), 0)}, 10)
 end)
 
@@ -4654,10 +4647,8 @@ client.set_event_callback("paint", function()
 end
 end)
 
--- Переменная для хранения оригинального значения хитчанса
 original_hitchance = nil
 
--- Функция определения текущего состояния
 function get_current_state()
 local localplayer = entity.get_local_player()
 if not localplayer then return "Global" end
@@ -4690,7 +4681,6 @@ table_contains = function(table, value)
     return false
 end
 
--- Callback для управления хитчансом
 client.set_event_callback("setup_command", function()
 if not ui_elements.ragebotik.additional_hitchance:get() then 
     if original_hitchance then
@@ -4798,6 +4788,7 @@ watermark_bg = renderer.load_svg([[
   <rect width="250" height="28" rx="5" ry="5" fill="url(#grad)" filter="url(#shadow)" />
 </svg>
 ]], 250, 28)
+
 function handle_watermark()
     if not ui_elements.main_check.value then return end
     
@@ -4822,36 +4813,27 @@ function render_modern_watermark()
     local screen_w, screen_h = client.screen_size()
     local x, y = 10, 10
     
-    -- Определяем цвета
-    local purple_color = {156, 79, 176, 255} -- Фиолетовый цвет как на скриншоте
-    local glow_color = {156, 79, 176, 50} -- Цвет свечения (более прозрачный)
+    local purple_color = {156, 79, 176, 255}
+    local glow_color = {156, 79, 176, 50}
     
-    -- Собираем текст ватермарки
     local watermark_text = "Velours-beta.lua  FPS: " .. fps .. "  |  v" .. version .. "  |  " .. entity.get_player_name(entity.get_local_player())
     if current_config ~= "-" then
         watermark_text = watermark_text .. "  |  " .. current_config
     end
     
-    -- Измеряем размер текста
     local text_width, text_height = renderer.measure_text("", watermark_text)
     
-    -- Добавляем отступы
     local padding_x, padding_y = 8, 4
     local box_width = text_width + padding_x * 2
     local box_height = text_height + padding_y * 2
     
-    -- Определяем позицию (в правом верхнем углу)
     x = screen_w - box_width - 10
     
-    -- Рисуем свечение (несколько прямоугольников с уменьшающейся прозрачностью)
     for i = 3, 1, -1 do
         renderer.rectangle(x - i, y - i, box_width + i * 2, box_height + i * 2, glow_color[1], glow_color[2], glow_color[3], glow_color[4] / i)
     end
-    
-    -- Рисуем обводку прямоугольника
+
     renderer.rectangle(x - 1, y - 1, box_width + 2, box_height + 2, purple_color[1], purple_color[2], purple_color[3], purple_color[4])
-    
-    -- Рисуем текст
     renderer.text(x + padding_x, y + padding_y, 255, 255, 255, 255, "", 0, watermark_text)
 end
 watermark_func = function()
@@ -4923,6 +4905,251 @@ function on_paint()
 end
 
 client.set_event_callback('paint', on_paint)
+
+function distance3d(x1, y1, z1, x2, y2, z2)
+	return math_sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1))
+end
+
+function renderer_is_thirdperson()
+	local x, y, z = client_eye_position()
+	local pitch, yaw = client_camera_angles()
+
+	yaw = yaw - 180
+	pitch, yaw = math_rad(pitch), math_rad(yaw)
+
+	x = x + math_cos(yaw)*4
+	y = y + math_sin(yaw)*4
+	z = z + math_sin(pitch)*4
+
+	local wx, wy = renderer_world_to_screen(x, y, z)
+	return wx ~= nil
+end
+
+function is_player(entindex)
+	return entity.get_classname(entindex) == "CCSPlayer"
+end
+
+function is_teammate(player)
+	return is_player(player) and entity_get_prop(player, "m_iTeamNum") == entity_get_prop(entity_get_local_player(), "m_iTeamNum")
+end
+
+function lerp_pos(x1, y1, z1, x2, y2, z2, percentage)
+	local x = (x2 - x1) * percentage + x1
+	local y = (y2 - y1) * percentage + y1
+	local z = (z2 - z1) * percentage + z1
+	return x, y, z
+end
+
+function trace_line_skip_teammates(skip_entindex, x1, y1, z1, x2, y2, z2, max_traces)
+	local max_traces = max_traces or 10
+	local fraction, entindex_hit = 0, -1
+	local x_hit, y_hit, z_hit = x1, y1, z1
+
+	local i=1
+	while (entindex_hit == -1 or (entindex_hit ~= 0 and is_teammate(entindex_hit))) and 1 > fraction and max_traces >= i do
+		fraction, entindex_hit = client_trace_line(entindex_hit, x_hit, y_hit, z_hit, x2, y2, z2)
+		x_hit, y_hit, z_hit = lerp_pos(x_hit, y_hit, z_hit, x2, y2, z2, fraction)
+
+		i = i + 1
+	end
+
+	local traveled_total = distance3d(x1, y1, z1, x_hit, y_hit, z_hit)
+	local total_distance = distance3d(x1, y1, z1, x2, y2, z2)
+
+	return traveled_total/total_distance, entindex_hit
+end
+
+function trace_line_skip(skip_function, x1, y1, z1, x2, y2, z2, max_traces)
+	local max_traces = max_traces or 10
+	local fraction, entindex_hit = 0, -1
+	local x_hit, y_hit, z_hit = x1, y1, z1
+	local skip_entindex = -1
+
+	local i=1
+	while (entindex_hit == -1 or (entindex_hit ~= 0 and skip_function(entindex_hit))) and 1 > fraction and max_traces >= i do
+		fraction, entindex_hit = client.trace_line(entindex_hit, x_hit, y_hit, z_hit, x2, y2, z2)
+		x_hit, y_hit, z_hit = lerp_pos(x_hit, y_hit, z_hit, x2, y2, z2, fraction)
+
+		i = i + 1
+	end
+
+	local traveled_total = distance3d(x1, y1, z1, x_hit, y_hit, z_hit)
+	local total_distance = distance3d(x1, y1, z1, x2, y2, z2)
+
+	return traveled_total/total_distance, entindex_hit
+end
+
+function hsv_to_rgb(h, s, v, a)
+  local r, g, b
+
+  local i = math_floor(h * 6);
+  local f = h * 6 - i;
+  local p = v * (1 - s);
+  local q = v * (1 - f * s);
+  local t = v * (1 - (1 - f) * s);
+
+  i = i % 6
+
+  if i == 0 then r, g, b = v, t, p
+  elseif i == 1 then r, g, b = q, v, p
+  elseif i == 2 then r, g, b = p, v, t
+  elseif i == 3 then r, g, b = p, q, v
+  elseif i == 4 then r, g, b = t, p, v
+  elseif i == 5 then r, g, b = v, p, q
+  end
+
+  return r * 255, g * 255, b * 255, a * 255
+end
+
+function on_run_command(e)
+    local weapon_name_prev = nil
+    local last_switch = 0
+    local accuracy = 1
+    local MOVETYPE_NOCLIP = 8
+
+    local is_thirdperson, is_thirdperson_prev
+	points = {}
+	local local_player = entity.get_local_player()
+
+	local weapon = entity.get_player_weapon(local_player)
+	if weapon == nil then
+		return
+	end
+	local weapon_name = entity.get_classname(weapon)
+
+	local radius
+	if weapon_name == "CWeaponTaser" or weapon_name_prev == "CWeaponTaser" then
+		radius = 183-16
+	else
+		return
+	end
+
+	local local_x, local_y, local_z = entity_get_prop(local_player, "m_vecAbsOrigin")
+	
+	local vo_z = entity_get_prop(local_player, "m_vecViewOffset[2]")-4
+	
+	local position_option = ui_elements.buybotik.position_reference:get()
+	local height_offset
+	
+	if position_option == "At middle" then
+		height_offset = vo_z * 1.3
+	else
+		height_offset = 0
+	end
+
+	if not is_thirdperson then
+		if position_option == "At middle" then
+			height_offset = height_offset - 12
+		else
+			height_offset = 0
+		end
+	end
+
+	for rot=0, 360, accuracy do
+		local rot_temp = math_rad(rot)
+		local temp_x, temp_y, temp_z = local_x + radius * math_cos(rot_temp), local_y + radius * math_sin(rot_temp), local_z
+		
+		local trace_z = local_z + height_offset
+		local fraction, entindex_hit = trace_line_skip(is_player, local_x, local_y, trace_z, temp_x, temp_y, trace_z)
+
+		local fraction_x, fraction_y = lerp_pos(local_x, local_y, local_z, temp_x, temp_y, temp_z, fraction)
+
+		local hue_extra = globals_realtime() % 8 / 8
+		local r, g, b = hsv_to_rgb(rot/360+hue_extra, 1, 1, 255)
+
+		local fraction_multiplier = 1
+		table_insert(points, {rot, fraction_x, fraction_y, trace_z, fraction_multiplier})
+	end
+end
+client.set_event_callback("run_command", on_run_command)
+
+function on_paint()
+	if not ui_elements.buybotik.enabled_reference:get() then
+		return
+	end
+
+	local local_player = entity.get_local_player()
+
+	if not entity_is_alive(local_player) then
+		points = {}
+		return
+	end
+
+	local curtime = globals_curtime()
+
+	local weapon = entity.get_player_weapon(local_player)
+	if weapon == nil then
+		return
+	end
+
+	local weapon_name = entity.get_classname(weapon)
+
+	if weapon_name ~= weapon_name_prev then
+		last_switch = curtime
+		weapon_name_prev = weapon_name
+	end
+
+	local opacity
+	if weapon_name == "CWeaponTaser" or weapon_name_prev == "CWeaponTaser" then
+		opacity = 1
+	else
+		is_thirdperson_prev = nil
+		return
+	end
+
+	is_thirdperson_prev = is_thirdperson
+	is_thirdperson = renderer_is_thirdperson()
+
+	if is_thirdperson_prev ~= is_thirdperson or entity_get_prop(local_player, "m_MoveType") == MOVETYPE_NOCLIP then
+		on_run_command()
+	end
+
+	local fade_multiplier
+	if curtime - last_switch < 0.3 then
+		fade_multiplier = (curtime - last_switch) * 1/0.3
+	else
+		fade_multiplier = 1
+	end
+
+	if weapon_name ~= "CWeaponTaser" and weapon_name == "CWeaponTaser" then
+		fade_multiplier = 1 - fade_multiplier
+	end
+
+	if fade_multiplier == 0 then
+		return
+	end
+	local opacity_multiplier = opacity * fade_multiplier
+
+	local points_amt = #points
+	local shift = globals_realtime() % 8 / 8
+
+	local previous_world_x, previous_world_y
+	for i=1, points_amt do
+		local rot, fraction_x, fraction_y, temp_z, fraction_multiplier = unpack(points[i])
+
+		local world_x, world_y = renderer_world_to_screen(fraction_x, fraction_y, temp_z)
+		local r, g, b = hsv_to_rgb(rot/360+shift, 1, 1, 255)
+
+		local i_s = i / points_amt
+		i_s = i_s + ((shift * 4) % 1)
+		i_s = i_s % 1
+
+		local temp_multiplier = 0.4 + (i_s * 0.6)
+
+		fraction_multiplier = fraction_multiplier * temp_multiplier
+
+		if world_x ~= nil and previous_world_x ~= nil then
+			renderer_line(world_x, world_y, previous_world_x, previous_world_y, r, g, b, 255*opacity_multiplier*fraction_multiplier)
+			renderer_line(world_x, world_y+1, previous_world_x, previous_world_y+1, r, g, b, 50*opacity_multiplier*fraction_multiplier)
+		end
+		previous_world_x, previous_world_y = world_x, world_y
+	end
+end
+client.set_event_callback("paint", on_paint)
+
+ui_elements.buybotik.position_reference:set_callback(function()
+    on_run_command()
+end)
 
 
 client.set_event_callback("shutdown", onshutdown)
