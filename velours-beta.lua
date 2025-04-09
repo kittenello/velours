@@ -5357,7 +5357,7 @@ ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurt
 ui_elements.settings.console_filter:set_callback(main_funcs.console_filter_f)
 ui_elements.settings.enhance_bt:set_callback(main_funcs.backtrack_f)
 client_delay_call(0.1, function() main_funcs.console_filter_f() main_funcs.viewmodel_changer_func() main_funcs.backtrack_f() end)
-
+--1
 ui_elements.settings.viewmodel_check:set_callback(main_funcs.viewmodel_changer_func)
 ui_elements.settings.viewmodel_x:set_callback(main_funcs.viewmodel_changer_func)
 ui_elements.settings.viewmodel_y:set_callback(main_funcs.viewmodel_changer_func)
