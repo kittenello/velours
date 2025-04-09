@@ -171,10 +171,6 @@ local ui_elements = {
         export_btn = ui_button(other_group, "\aFFFFFFFF Export", function() end),
     },
     buybotik = {
-        ogo_labesl = ui_label(other_group, "\v•\r Other"),
-        rage_labshhgel_line = ui_label(other_group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
-        ogo_labedl = ui_label(main_group, "\v•\r Miscellaneous"),
-        rage_labdhhgel_line = ui_label(main_group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
         ogo_label = ui_label(group, "\v•\r BuyBot"),
         rage_labhhgel_line = ui_label(group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
         buybot_enabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy"),
@@ -1025,7 +1021,7 @@ ui_elements.settings.distance_slider:depend(ui_elements.settings.anti_media)
 ui_elements.settings.auto_smoke_bind:depend(ui_elements.settings.auto_smoke)
 ui_elements.settings.indicator_label:depend(ui_elements.settings.indicator_redesign)
 ui_elements.settings.custom_indicator:depend(ui_elements.settings.indicator_redesign)
-ui_elements.buybotik.position_reference:depend(ui_elements.buybotik.enabled_reference)
+ui_elements.settings.position_reference:depend(ui_elements.settings.enabled_reference)
 ui_elements.settings.auto_smoke_cam:depend(ui_elements.settings.auto_smoke)
 ui_elements.settings.fog_density:depend(ui_elements.settings.fog_correction)
 ui_elements.settings.fog_distance:depend(ui_elements.settings.fog_correction)
@@ -5158,12 +5154,12 @@ ui_elements.buybotik.position_reference:set_callback(function()
 end)
 
 ---@diagnostic disable
-
 --region Dependencies
 
 if not pcall(require, 'gamesense/dumped_nade_prediction') then
     error('Missing nade prediction library. Please download at https://gamesense.pub/forums/viewtopic.php?id=34582')
 end
+
 local vector = require "vector"
 local nade_prediction = require 'gamesense/nade_prediction'
 local entity_lib = require "gamesense/entity"
@@ -5225,7 +5221,7 @@ arrNadeRadiuses = {
     ["CSmokeGrenade"] = 144;
     ["CMolotovGrenade"] = 150;
     ["CIncendiaryGrenade"] = 150;
-    ["CHEGrenade"] = 340;
+    ["CHEGrenade"] = 340; -- VSE?
 };
 nades = {
     data = {},
@@ -5270,28 +5266,8 @@ nades = {
         if (entity.get_classname(ent_wpn) ~= 'CHEGrenade' and entity.get_classname(ent_wpn) ~= 'CMolotovGrenade' and entity.get_classname(ent_wpn) ~= 'CIncendiaryGrenade' and entity.get_classname(ent_wpn) ~= "CSmokeGrenade")  then nades.data = {} end
     end
 
-    -- Function to check if the grenade is near an enemy
-    function nades:is_near_enemy(nade_pos)
-        local enemies = entity.get_players()  -- Use get_players to get all players
-        local local_player = entity.get_local_player()
-        local player_team = entity.get_prop(local_player, "m_iTeamNum")  -- Get player's team
-        local max_distance = 155  -- Set a max distance to trigger the red color (can be adjusted)
-
-        for _, enemy in pairs(enemies) do
-            -- Check if the enemy is an actual player and not the local player, and is on the opposite team
-            if entity.is_alive(enemy) and entity.get_prop(enemy, "m_iTeamNum") ~= player_team then
-                local enemy_pos = vector(entity.get_prop(enemy, "m_vecOrigin"))
-                local dist = nade_pos:dist2d(enemy_pos)
-                if dist < max_distance then
-                    return true  -- Grenade is near this enemy
-                end
-            end
-        end
-        return false  -- No enemies close to the grenade
-    end
-
     function nades:draw()
-        local color_r, color_g, color_b, color_a = 255, 255, 255, 255; -- Default color is white
+        local color_r, color_g, color_b, color_a = 255, 255, 255, 255;
         local ss_x, ss_y = client.screen_size()
         local lp = entity.get_local_player();
         local ent_wpn = entity.get_player_weapon(lp);
@@ -5302,22 +5278,15 @@ nades = {
             local nade = nades.data[i]
             local vecNadePos = nade.end_pos;
             local dist = me_pos:dist2d(vecNadePos);
-
-            -- If the grenade is near an enemy, change color to red
-            if self:is_near_enemy(vecNadePos) then
-                color_r, color_g, color_b = 255, 0, 0  -- Red
-            else
-                color_r, color_g, color_b = 255, 255, 255  -- Default white
-            end
-
-            color_a = color_a * (1 - (math.min(1, dist / 2000)));
-            
+            color_a = color_a  * (1 - (math.min(1, dist / 2000)));
+            -- if dist < 280 then
             local flX, flY = renderer.world_to_screen(vecNadePos.x, vecNadePos.y, vecNadePos.z);
             if flX ~= nil and flY ~= nil then 
                 renderer.circle_outline(flX, flY, 0, 0, 0, color_a, 3, 0, 1, 1);
                 renderer.circle(flX, flY, color_r, color_g, color_b, color_a, 2, 0, 1);
             end;
-            renderer.draw_circle_3d(vecNadePos.x, vecNadePos.y, vecNadePos.z, rad, color_r, color_g, color_b, color_a, 45, 1, true); -- Draw 3D circle with the correct color
+            renderer.draw_circle_3d(vecNadePos.x, vecNadePos.y, vecNadePos.z, rad, color_r, color_g, color_b, color_a, 45, 1, true); --proverku na radius esli chto sam sdelaesh tip pod every grenade svoy radius prosto new stroka?
+            -- end
         end
     end
 end;
