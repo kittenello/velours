@@ -3846,7 +3846,7 @@ function on_paint()
         on_run_command()
     end
 
-    if molotov_radius then
+    if molotov_radius and molotovs ~= nil then
         local r, g, b, a = ui_elements.settings.molotov_radius_reference.color:get()
 
         for i=1, #molotovs do
