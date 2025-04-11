@@ -4671,9 +4671,9 @@ if not pcall(require, 'gamesense/dumped_nade_prediction') then
     error('Missing nade prediction library. Please download at https://gamesense.pub/forums/viewtopic.php?id=34582')
 end
 
-local vector = require "vector"
-local nade_prediction = require 'gamesense/nade_prediction'
-local entity_lib = require "gamesense/entity"
+lvector = require "vector"
+nade_prediction = require 'gamesense/nade_prediction'
+entity_lib = require "gamesense/entity"
 
 ---@region render
 do
