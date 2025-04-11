@@ -3831,7 +3831,7 @@ function on_run_command(e)
                 molotovs_cells[molotov] = cells
             end
         end
-    end
+    end--
 end
 client.set_event_callback("run_command", on_run_command)
 
