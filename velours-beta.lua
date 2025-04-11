@@ -183,7 +183,7 @@ local ui_elements = {
         svaston = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFSvaston"),
         enabled_reference = ui_checkbox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaser Range"),
         position_reference = ui_combobox(main_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTaser Range Position", {"At feet", "At middle"}),
-        grenade_warning = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFGrenade Prediction"),
+        grenade_warning = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFGrenade Prediction", {255, 255, 255, 255}),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -2471,61 +2471,6 @@ local rage_settings_module = {
     better_jump_scout_disable = function() aa_refs.autostrafer:override() end
 }
 
-local steamworks = require "gamesense/steamworks"
-local ISteamNetworking = steamworks.ISteamNetworking
-local EP2PSend = steamworks.EP2PSend
-local js = panorama.open()
-local MyPersonaAPI = js.MyPersonaAPI
-local GameStateAPI = js.GameStateAPI
-local shared_logo = {
-    main_f = function()
-
-        steamworks.set_callback("P2PSessionRequest_t", function(request)
-            -- ISteamNetworking.CloseP2PSessionWithUser(request.m_steamIDRemote)
-
-            print(request.m_steamIDRemote)
-            ISteamNetworking.AcceptP2PSessionWithUser(request.m_steamIDRemote)
-            local success, result = ISteamNetworking.GetP2PSessionState(request.m_steamIDRemote)
-            print(request.m_steamIDRemote)
-
-        end)
-        for player=1, globals.maxplayers() do
-            local SteamXUID = GameStateAPI.GetPlayerXuidStringFromEntIndex(player)
-
-            if SteamXUID:len() > 7 and SteamXUID ~= MyPersonaAPI.GetXuid() then
-            print(SteamXUID .. "-PRE")
-                local target = steamworks.SteamID(SteamXUID)
-                local msg = "hello"
-                ISteamNetworking.CloseP2PSessionWithUser(target)
-                ISteamNetworking.AcceptP2PSessionWithUser(target)
-                ISteamNetworking.SendP2PPacket(target, "asdf", 4, EP2PSend.UnreliableNoDelay, 0)
-                -- local identity = steamworks.
-                -- ISteamNetworking.accept_session_with_user(player)
-                -- ISteamNetworking.send_message_to_user(target, "asdb", 4, 8, 1337)
-            end
-        end
-        -- local tbl, s = ISteamNetworking.receive_messages_on_channel(1337, )
-        -- for i = 1, tbl do
-        --     print(tbl.m_pData == nil)
-        --     if s[i - 1][0] and ffi.string(tbl.m_pData) and entity.get(slot7.idx) then
-        --         print("YES")
-        --     end
-        -- end
-    end,
-    disable_f = function()
-        for player=1, globals.maxplayers() do
-            local SteamXUID = GameStateAPI.GetPlayerXuidStringFromEntIndex(player)
-            if SteamXUID:len() > 7 and SteamXUID ~= MyPersonaAPI.GetXuid() then
-                local target = steamworks.SteamID(SteamXUID)
-                local success, result = ISteamNetworking.GetP2PSessionState(target)
-for k, v in pairs(result) do print(k .. " - " .. tostring(v)) end
-                ISteamNetworking.CloseP2PSessionWithUser(target)
-            end
-        end
-    end,
-}
--- shared_logo.main_f()
--- client_delay_call(5, function() shared_logo.disable_f() end)
 local aim_fire_data = {}
 local hitlogs_module = {
     aim_fire = function(e)
@@ -5206,13 +5151,6 @@ do
         end
     end
 end;
---endregion
-
---region Menu
-menu = {
-    switch = ui.new_checkbox('Visuals', 'Other ESP', 'Nade Warning')
-}
---endregion
 
 --region Main
 nade_p = nade_prediction:create()
@@ -5267,7 +5205,7 @@ nades = {
     end
 
     function nades:draw()
-        local color_r, color_g, color_b, color_a = 255, 255, 255, 255;
+        local color_r, color_g, color_b, color_a = ui_elements.buybotik.grenade_warning.color:get()
         local ss_x, ss_y = client.screen_size()
         local lp = entity.get_local_player();
         local ent_wpn = entity.get_player_weapon(lp);
@@ -5357,7 +5295,7 @@ ui_elements.settings.hitlogs:set_event('player_hurt', hitlogs_module.player_hurt
 ui_elements.settings.console_filter:set_callback(main_funcs.console_filter_f)
 ui_elements.settings.enhance_bt:set_callback(main_funcs.backtrack_f)
 client_delay_call(0.1, function() main_funcs.console_filter_f() main_funcs.viewmodel_changer_func() main_funcs.backtrack_f() end)
---1
+
 ui_elements.settings.viewmodel_check:set_callback(main_funcs.viewmodel_changer_func)
 ui_elements.settings.viewmodel_x:set_callback(main_funcs.viewmodel_changer_func)
 ui_elements.settings.viewmodel_y:set_callback(main_funcs.viewmodel_changer_func)
