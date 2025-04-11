@@ -140,7 +140,7 @@ textures = {
 
 local ui_elements = {
     main_check = ui_checkbox(group, "\bF7A6FD\b685F95[velours.lua]"),
-    tab = ui_combobox(main_group, "\n", {"Configs", "Anti-Aim", "Settings", "RageBot", "BuyBot"}),
+    tab = ui_combobox(main_group, "\n", {"Configs", "Anti-Aim", "Settings", "RageBot", "Other"}),
     info = {
         label_sp = ui_label(main_group, "\n\n\n"),
         label_tab2 = ui_label(main_group, "\v•\r Information"),
@@ -173,7 +173,7 @@ local ui_elements = {
         export_btn = ui_button(other_group, "\aFFFFFFFF Export", function() end),
     },
     buybotik = {
-        ogo_label = ui_label(group, "\v•\r BuyBot"),
+        ogo_label = ui_label(group, "\v•\r Other"),
         rage_labhhgel_line = ui_label(group, "\a464646CC¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"),
         buybot_enabled = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy"),
         buybot_primary = ui_combobox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFAuto-Buy: Primary", get_names(primary_weapons)),
@@ -182,6 +182,7 @@ local ui_elements = {
         spamenabled = ui_checkbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFF\aA6B153FFNickName Changer Exploit\aFFFFFFFF"),
         nameg = ui_textbox(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFCustom Name"),
         labelexploit = ui_label(other_group, "\aF88BFFFF:3 ~ \aFFFFFFFFTutorial in t.me/velourscsgo"),
+        grenade_warning = ui_checkbox(group, "\aF88BFFFF:3 ~ \aFFFFFFFFGrenade Prediction", {255, 255, 255, 255}),
     },
     ragebotik = {
         rage_label = ui_label(group, "\v•\r Ragebot"),
@@ -398,7 +399,7 @@ local tab_names = {
     anti_aims = "Anti-Aim",
     settings = "Settings",
     ragebotik = "RageBot",
-    buybotik = "BuyBot",
+    buybotik = "Other",
     info = "Configs"
 }
 local tab_names_aa = {
@@ -3855,7 +3856,7 @@ function on_paint()
         on_run_command()
     end
 
-    if molotov_radius then
+    if molotov_radius and molotovs ~= nil then
         local r, g, b, a = ui_elements.settings.molotov_radius_reference.color:get()
 
         for i=1, #molotovs do
@@ -4662,6 +4663,149 @@ elseif original_hitchance then
     original_hitchance = nil
 end
 end)
+
+---@diagnostic disable
+--region Dependencies
+
+if not pcall(require, 'gamesense/dumped_nade_prediction') then
+    error('Missing nade prediction library. Please download at https://gamesense.pub/forums/viewtopic.php?id=34582')
+end
+
+local vector = require "vector"
+local nade_prediction = require 'gamesense/nade_prediction'
+local entity_lib = require "gamesense/entity"
+
+---@region render
+do
+    ---@param x number
+    ---@param y number
+    ---@param z number
+    ---@param radius number
+    ---@param r number
+    ---@param g number
+    ---@param b number
+    ---@param a number
+    ---@param accuracy number
+    ---@param width number
+    ---@param outline number
+    ---@param start_degrees number
+    ---@param percentage number
+    function renderer.draw_circle_3d(x, y, z, radius, r, g, b, a, accuracy, width, outline, start_degrees, percentage)
+        local accuracy = accuracy or 3
+        local width = width or 1
+        local outline = outline or false
+        local start_degrees = start_degrees ~= nil and start_degrees or 0
+        local percentage = percentage ~= nil and percentage or 1
+    
+        local screen_x_line_old, screen_y_line_old
+        for rot = start_degrees, percentage * 360, accuracy do
+            local rot_temp = math.rad(rot)
+            local lineX, lineY, lineZ = radius * math.cos(rot_temp) + x, radius * math.sin(rot_temp) + y, z
+            local screen_x_line, screen_y_line = renderer.world_to_screen(lineX, lineY, lineZ)
+            if screen_x_line ~= nil and screen_x_line_old ~= nil then
+                for i = 1, width do
+                    local i = i - 1
+                    renderer.line(screen_x_line, screen_y_line - i, screen_x_line_old, screen_y_line_old - i, r, g, b, a)
+                end
+                if outline then
+                    local outline_a = a / 255 * 160
+                    renderer.line(screen_x_line, screen_y_line - width, screen_x_line_old, screen_y_line_old - width, 16, 16, 16, outline_a)
+                    renderer.line(screen_x_line, screen_y_line + 1, screen_x_line_old, screen_y_line_old + 1, 16, 16, 16, outline_a)
+                end
+            end
+            screen_x_line_old, screen_y_line_old = screen_x_line, screen_y_line
+        end
+    end
+end;
+
+--region Main
+nade_p = nade_prediction:create()
+
+arrNadeRadiuses = {
+    ["CSmokeGrenade"] = 144;
+    ["CMolotovGrenade"] = 150;
+    ["CIncendiaryGrenade"] = 150;
+    ["CHEGrenade"] = 340; -- VSE?
+};
+nades = {
+    data = {},
+    last_throw = 0,
+    last_predict = 0,
+};do
+    function nades:get()
+        local v = entity.get_local_player();
+        local ent_wpn = entity.get_player_weapon(v)
+            
+        local m_fThrowTime = entity.get_prop(ent_wpn, 'm_fThrowTime')
+
+        if not m_fThrowTime or (entity.get_classname(ent_wpn) ~= 'CHEGrenade' and entity.get_classname(ent_wpn) ~= 'CMolotovGrenade' and entity.get_classname(ent_wpn) ~= 'CIncendiaryGrenade' and entity.get_classname(ent_wpn) ~= "CSmokeGrenade")  then return end
+    
+        nades.last_throw = globals.curtime()
+    
+        nade_p = nade_prediction.create()
+    
+        if nade_p:init(v) == false then 
+            print(nade_p.error)
+            return 
+        end
+    
+        local predict_info = nade_p:predict()
+    
+        for k,v in pairs(predict_info.points) do
+            if k > 1 then
+                if globals.tickcount() - nades.last_predict > 2 then
+                    table.insert(nades.data, {
+                        end_pos = v.end_pos,
+                        curtime = globals.curtime(),
+                        ent_wpn = ent_wpn
+                    })
+                end
+                nades.last_predict = globals.tickcount()
+            end
+        end
+    end
+
+    function nades:sanitize()
+        local ent_wpn = entity.get_player_weapon(entity.get_local_player());
+        if (entity.get_classname(ent_wpn) ~= 'CHEGrenade' and entity.get_classname(ent_wpn) ~= 'CMolotovGrenade' and entity.get_classname(ent_wpn) ~= 'CIncendiaryGrenade' and entity.get_classname(ent_wpn) ~= "CSmokeGrenade")  then nades.data = {} end
+    end
+
+    function nades:draw()
+        local color_r, color_g, color_b, color_a = ui_elements.buybotik.grenade_warning.color:get()
+        local ss_x, ss_y = client.screen_size()
+        local lp = entity.get_local_player();
+        local ent_wpn = entity.get_player_weapon(lp);
+        local szClassName = entity.get_classname(ent_wpn);
+        local me_pos = vector(entity.get_prop(lp, "m_vecOrigin"))
+        local rad = arrNadeRadiuses[szClassName] or 100
+        for i = 1, #nades.data do
+            local nade = nades.data[i]
+            local vecNadePos = nade.end_pos;
+            local dist = me_pos:dist2d(vecNadePos);
+            color_a = color_a  * (1 - (math.min(1, dist / 2000)));
+            -- if dist < 280 then
+            local flX, flY = renderer.world_to_screen(vecNadePos.x, vecNadePos.y, vecNadePos.z);
+            if flX ~= nil and flY ~= nil then 
+                renderer.circle_outline(flX, flY, 0, 0, 0, color_a, 3, 0, 1, 1);
+                renderer.circle(flX, flY, color_r, color_g, color_b, color_a, 2, 0, 1);
+            end;
+            renderer.draw_circle_3d(vecNadePos.x, vecNadePos.y, vecNadePos.z, rad, color_r, color_g, color_b, color_a, 45, 1, true); --proverku na radius esli chto sam sdelaesh tip pod every grenade svoy radius prosto new stroka?
+            -- end
+        end
+    end
+end;
+--endregion
+
+--region Callbacks
+client.set_event_callback('setup_command', function ()
+    nades:get()
+    nades:sanitize()
+end)
+client.set_event_callback('paint', function ()
+    if not ui_elements.buybotik.grenade_warning:get() then return end
+    nades:draw()
+end)
+--endregion
 
 
 client.set_event_callback("shutdown", onshutdown)
